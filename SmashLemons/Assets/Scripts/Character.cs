@@ -4,37 +4,41 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 { 
     /* Movement */
     [SerializeField]
-    private float speed;
-    private float jumpForce;
-    private float dashForce;
-    private bool isGrounded;
-    private float dashTimer;
-    private int remainingDashes;
-    private int maxDashes;
+    protected float speed;
+    protected float jumpForce;
+    protected float dashForce;
+    protected bool isGrounded;
+    protected float dashTimer;
+    protected int remainingDashes;
+    protected int maxDashes;
 
 
 
     /* Attacks */
-    private float attackDamage;
-    private float attackSpeed;
-    private float specialSpeed;
-    private float ultimateProgression;
+    protected float attackDamage;
+    protected float attackSpeed;
+    protected float specialSpeed;
+    protected float ultimateProgression;
+    protected float attackCooldown;
 
     /* Defense */
-    private bool isBlocking;
-    private float weight;
-    private float resistance;
-    private float takenDamage;
+    protected bool isBlocking;
+    protected float weight;
+    protected float resistance;
+    protected float takenDamage;
 
 
     /* References to other objects */
-    private Rigidbody body;
-    private Transform groundChecker;
-    private Transform shield;
+    protected Rigidbody body;
+    protected Transform groundChecker;
+    protected Transform shield;
+    protected Transform centerOfMass;
+    protected Animator animator;
+    protected Transform meleeRange;
 
     /* TODO Sort */
-    private Vector3 inputs = Vector3.zero;
-    private float GroundDistance = 0.2f;
+    protected Vector3 inputs = Vector3.zero;
+    protected float GroundDistance = 0.2f;
     public LayerMask Ground;
     float turnSmoothVelocity;
     float turnSmoothTime = 0.05f;
@@ -47,10 +51,10 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         this.speed = 5f;
         this.jumpForce = 2f;
         this.dashForce = 10f;
-        this.weight = 1f;
-        this.resistance = 1f;
+        this.weight = 100f;
+        this.resistance = 0f;
         this.attackDamage = 1f;
-        this.attackSpeed = 1f;
+        this.attackSpeed = 2f;
         this.specialSpeed = 1f;
         this.ultimateProgression = 0f;
         this.isBlocking = false;
@@ -60,6 +64,9 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     void Start() {
         body = GetComponent<Rigidbody>();
         groundChecker = transform.GetChild(0);
+        animator = GetComponent<Animator>();
+        meleeRange = transform.Find("MeleeRange");
+        centerOfMass = transform.Find("CenterOfMass");
     }
 
     void Update() {
@@ -91,10 +98,13 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         }
 
         if (direction.magnitude >= 0.1f) {
-            //animator.SetBool("isMoving", true);
+            animator.SetBool("isMoving", true);
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        }
+        else{
+            animator.SetBool("isMoving", false);
         }
 
 
@@ -106,6 +116,20 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
             dashDirection = inputs.x;
             remainingDashes--;
             Dash();
+        }
+
+        if(Input.GetButtonDown("Attack")){
+            
+            if(attackCooldown<= 0f){
+                attackCooldown = 1f / attackSpeed;
+                Attack();
+            }
+        }
+        if (attackCooldown > 0f) {
+            attackCooldown -= Time.deltaTime;
+        }
+        else{
+            meleeRange.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
         }
     }
 
@@ -137,7 +161,14 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public void Attack() {
-        throw new System.NotImplementedException();
+        meleeRange.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
+        Collider[] hitColliders = Physics.OverlapSphere(meleeRange.position, 0.3f);
+        foreach (var hitCollider in hitColliders) {
+            if(hitCollider.tag == "Player" && hitCollider.name != transform.name){
+                hitCollider.transform.GetComponent<Character>().TakeDamage(meleeRange.position, attackDamage);
+            }
+            
+        }
     }
 
     public void SpecialAttack() {
@@ -161,21 +192,31 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public float TakeDamage(Vector3 origin, float amount) {
+        Debug.Log(centerOfMass.name);
         // Attaque du côté du shield: (transform.position - origin).x * (shield.position - transform.position).x NEGATIF
         // Attaque de côté opposé au shield: (transform.position - origin).x * (shield.position - transform.position).x POSITIF
-        if(!isBlocking || (transform.position - origin).x * (shield.position - transform.position).x > 0){
-            takenDamage += amount - amount*(resistance/100);
+        if (!isBlocking || (transform.position - origin).x * (shield.position - transform.position).x > 0) {
+            takenDamage += amount - amount * (resistance / 100);
+            Vector3 direction = (centerOfMass.position - origin).normalized;
+            direction *= (1 + takenDamage) * (weight / 100);
+            Debug.Log(takenDamage);
             // Add pushForce;
+            body.AddForce(direction, ForceMode.VelocityChange);
             //(1+takenDamage) * weight/100
+            Debug.Log("Target takes a " + amount + " hit.");
             return amount;
-        }
-        else{
+        } else {
+            Debug.Log("Target blocks a " + amount + " hit.");
             return 0;
         }
     }
 
-    void Die(){
+    public void Die() {
         //checkForLivesLeft
         //Respawn
+        body.velocity = new Vector3(0f, body.velocity.y, body.velocity.z);
+        body.angularVelocity = new Vector3(0f, body.angularVelocity.y, body.angularVelocity.z);
+        transform.position = new Vector3(0f, 10f, 0f);
+
     }
 }

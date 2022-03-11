@@ -8,7 +8,7 @@ public class DeadZone : MonoBehaviour
         Debug.Log("Collide");
         if(other.tag == "Player"){
             Debug.Log("isPlayer");
-            other.GetComponent<PlayerController>().Respawn();
+            other.GetComponent<Character>().Die();
         }
     }
 }

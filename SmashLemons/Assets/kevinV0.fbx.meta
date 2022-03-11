@@ -1,23 +1,26 @@
 fileFormatVersion: 2
-guid: 44a5093a71ea98942919d532b8da201e
+guid: 547831f959b07454496c8a25808d076a
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable:
   - first:
-      74: -4449717305648701825
-    second: Armature|0TPose
+      74: -1437223564310770781
+    second: Armature|0Tpose
   - first:
-      74: -8945691123924629249
-    second: Armature|Idle
+      74: 5996607452920361434
+    second: Armature|1idle
   - first:
-      74: -7551964380084998518
-    second: Armature|Run
+      74: -7110375873338004475
+    second: Armature|2run
   - first:
-      74: -236022367644965580
-    second: Armature|Idle (1)
+      74: -5688699569640100776
+    second: Armature|KnifeAction
   - first:
-      74: 6503710843971187167
-    second: Armature|Run (1)
+      74: -8325733381008586006
+    second: Knife|KnifeAction
+  - first:
+      74: 1341069637754998613
+    second: Armature|1idle (1)
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -47,8 +50,8 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Armature|Idle (1)
-      takeName: Armature|Idle
+      name: Armature|1idle (1)
+      takeName: Armature|1idle
       internalID: 0
       firstFrame: 0
       lastFrame: 40
@@ -59,7 +62,7 @@ ModelImporter:
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
-      loopBlend: 1
+      loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
@@ -76,8 +79,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Idle
-      takeName: Armature|Idle
+      name: Armature|1idle
+      takeName: Armature|1idle
       internalID: 0
       firstFrame: 0
       lastFrame: 40
@@ -87,8 +90,8 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
+      loopTime: 0
+      loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
@@ -105,19 +108,77 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Run
-      takeName: Armature|Run
+      name: Armature|2run
+      takeName: Armature|2run
       internalID: 0
       firstFrame: 0
-      lastFrame: 22
+      lastFrame: 1
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Armature|KnifeAction
+      takeName: Armature|KnifeAction
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Knife|KnifeAction
+      takeName: Knife|KnifeAction
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
