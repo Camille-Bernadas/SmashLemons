@@ -66,63 +66,66 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         groundChecker = transform.GetChild(0);
         animator = GetComponent<Animator>();
         meleeRange = transform.Find("MeleeRange");
+        shield = transform.Find("Shield");
         centerOfMass = transform.Find("CenterOfMass");
     }
 
     void Update() {
         isGrounded = Physics.CheckSphere(groundChecker.position, GroundDistance, Ground, QueryTriggerInteraction.Ignore);
-        if(isGrounded){
-            if(dashTimer <= 0f){
+        if (isGrounded) {
+            if (dashTimer <= 0f) {
                 remainingDashes = maxDashes;
-            }
-            else{
+            } else {
                 dashTimer -= Time.deltaTime;
             }
-            
+
         }
 
+        
 
         inputs = Vector3.zero;
         inputs.x = Input.GetAxisRaw("Horizontal");
         inputs.y = Input.GetAxis("Vertical");
         inputs = inputs.normalized;
-        Vector3 direction = new Vector3(inputs.x, 0f/*vertical*/, 0f).normalized;
-        if(Mathf.Abs(inputs.x) >= 0.1f){
-            lastDirection = new Vector3(inputs.x, 0f, 0f);
-        }
 
-        // Lors d'un changement de sens lors d'un dash, la velocité est annulée
-        if(inputs.x * dashDirection < 0f){
-            body.velocity = new Vector3(0f, body.velocity.y, body.velocity.z);
-            body.angularVelocity = new Vector3(0f, body.angularVelocity.y, body.angularVelocity.z);
-        }
+        if(!isBlocking){
+            Vector3 direction = new Vector3(inputs.x, 0f/*vertical*/, 0f).normalized;
+            if (Mathf.Abs(inputs.x) >= 0.1f) {
+                lastDirection = new Vector3(inputs.x, 0f, 0f);
+            }
 
-        if (direction.magnitude >= 0.1f) {
-            animator.SetBool("isMoving", true);
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-        }
-        else{
-            animator.SetBool("isMoving", false);
-        }
+            // Lors d'un changement de sens lors d'un dash, la velocité est annulée
+            if (inputs.x * dashDirection < 0f) {
+                body.velocity = new Vector3(0f, body.velocity.y, body.velocity.z);
+                body.angularVelocity = new Vector3(0f, body.angularVelocity.y, body.angularVelocity.z);
+            }
 
+            if (direction.magnitude >= 0.1f) {
+                animator.SetBool("isMoving", true);
+                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            } else {
+                animator.SetBool("isMoving", false);
+            }
+        }
 
         if (Input.GetButtonDown("Jump") && isGrounded) {
             Jump();
         }
-        if (Input.GetButtonDown("Dash") && remainingDashes>0) {
+        if (Input.GetButtonDown("Dash") && remainingDashes > 0) {
             dashTimer = 0.1f;
             dashDirection = inputs.x;
             remainingDashes--;
             Dash();
         }
 
+
         if(Input.GetButtonDown("Attack")){
             
             if(attackCooldown<= 0f){
                 attackCooldown = 1f / attackSpeed;
-                Attack();
+                Attack(inputs);
             }
         }
         if (attackCooldown > 0f) {
@@ -131,12 +134,24 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         else{
             meleeRange.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
         }
+
+        if (Input.GetButtonDown("Block")) {
+            animator.SetBool("isMoving", false);
+            Block();
+            shield.GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
+        }
+        if (Input.GetButtonUp("Block")) {
+            isBlocking = false;
+            shield.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
+        }
     }
 
 
     void FixedUpdate() {
-        Vector3 move = new Vector3(inputs.x, 0f, 0f);
-        Move(move);
+        if (!isBlocking) {
+            Vector3 move = new Vector3(inputs.x, 0f, 0f);
+            Move(move);
+        }
     }
 
 
@@ -160,12 +175,36 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         Debug.Log("Dash");
     }
 
-    public void Attack() {
+    public void Attack(Vector3 direction) {
+        float Xdir = direction.x;
+        if(Xdir > 0.7f){
+            Xdir = 1f;
+        }
+        else{
+            if (Xdir < -0.7f) {
+                Xdir = -1f;
+            }
+            else{
+                Xdir = 0f;
+            }
+        }
+        float Ydir = direction.y;
+        if (Ydir > 0.7f) {
+            Ydir = 1f;
+        } else {
+            if (Ydir < -0.7f) {
+                Ydir = -1f;
+            } else {
+                Ydir = 0f;
+            }
+        }
+        Vector3 projectionVector = new Vector3(Xdir, Ydir, 0f);
+
         meleeRange.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
         Collider[] hitColliders = Physics.OverlapSphere(meleeRange.position, 0.3f);
         foreach (var hitCollider in hitColliders) {
             if(hitCollider.tag == "Player" && hitCollider.name != transform.name){
-                hitCollider.transform.GetComponent<Character>().TakeDamage(meleeRange.position, attackDamage);
+                hitCollider.transform.GetComponent<Character>().TakeDamage(meleeRange.position, projectionVector, attackDamage);
             }
             
         }
@@ -191,18 +230,29 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         return amount;
     }
 
-    public float TakeDamage(Vector3 origin, float amount) {
-        Debug.Log(centerOfMass.name);
+    public float TakeDamage(Vector3 origin, Vector3 projection, float amount) {
         // Attaque du côté du shield: (transform.position - origin).x * (shield.position - transform.position).x NEGATIF
         // Attaque de côté opposé au shield: (transform.position - origin).x * (shield.position - transform.position).x POSITIF
         if (!isBlocking || (transform.position - origin).x * (shield.position - transform.position).x > 0) {
             takenDamage += amount - amount * (resistance / 100);
-            Vector3 direction = (centerOfMass.position - origin).normalized;
+
+            /***/
+            Vector3 direction = new Vector3(centerOfMass.position.x - origin.x, 0f, 0f).normalized;
+            if(projection.y == 0f){
+                direction = new Vector3(centerOfMass.position.x - origin.x, 0f, 0f).normalized;
+            }
+            else{
+                direction = new Vector3(projection.x, projection.y, 0f).normalized;
+            }
+            Debug.Log(direction);
+
             direction *= (1 + takenDamage) * (weight / 100);
             Debug.Log(takenDamage);
             // Add pushForce;
             body.AddForce(direction, ForceMode.VelocityChange);
             //(1+takenDamage) * weight/100
+
+            /***/
             Debug.Log("Target takes a " + amount + " hit.");
             return amount;
         } else {
@@ -214,6 +264,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     public void Die() {
         //checkForLivesLeft
         //Respawn
+        takenDamage = 0f;
         body.velocity = new Vector3(0f, body.velocity.y, body.velocity.z);
         body.angularVelocity = new Vector3(0f, body.angularVelocity.y, body.angularVelocity.z);
         transform.position = new Vector3(0f, 10f, 0f);
