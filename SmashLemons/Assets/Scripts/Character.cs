@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 { 
@@ -37,7 +38,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     protected Transform meleeRange;
 
     /* TODO Sort */
-    protected Vector3 inputs = Vector3.zero;
+    protected Vector2 inputs = Vector2.zero;
     protected float GroundDistance = 0.2f;
     public LayerMask Ground;
     float turnSmoothVelocity;
@@ -45,15 +46,15 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     private Vector3 lastDirection;
 
     float dashDirection;
-
+    public PlayerUIManager uiManager;
 
     private void Awake() {
         this.speed = 5f;
-        this.jumpForce = 2f;
-        this.dashForce = 10f;
+        this.jumpForce = 1f;
+        this.dashForce = 4f;
         this.weight = 100f;
         this.resistance = 0f;
-        this.attackDamage = 1f;
+        this.attackDamage = 20f;
         this.attackSpeed = 2f;
         this.specialSpeed = 1f;
         this.ultimateProgression = 0f;
@@ -81,11 +82,6 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 
         }
 
-        
-
-        inputs = Vector3.zero;
-        inputs.x = Input.GetAxisRaw("Horizontal");
-        inputs.y = Input.GetAxis("Vertical");
         inputs = inputs.normalized;
 
         if(!isBlocking){
@@ -110,24 +106,6 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
             }
         }
 
-        if (Input.GetButtonDown("Jump") && isGrounded) {
-            Jump();
-        }
-        if (Input.GetButtonDown("Dash") && remainingDashes > 0) {
-            dashTimer = 0.1f;
-            dashDirection = inputs.x;
-            remainingDashes--;
-            Dash();
-        }
-
-
-        if(Input.GetButtonDown("Attack")){
-            
-            if(attackCooldown<= 0f){
-                attackCooldown = 1f / attackSpeed;
-                Attack(inputs);
-            }
-        }
         if (attackCooldown > 0f) {
             attackCooldown -= Time.deltaTime;
         }
@@ -135,15 +113,6 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
             meleeRange.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
         }
 
-        if (Input.GetButtonDown("Block")) {
-            animator.SetBool("isMoving", false);
-            Block();
-            shield.GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
-        }
-        if (Input.GetButtonUp("Block")) {
-            isBlocking = false;
-            shield.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
-        }
     }
 
 
@@ -154,28 +123,46 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         }
     }
 
-
+    public void OnMove(InputAction.CallbackContext ctx) => inputs = ctx.ReadValue<Vector2>();
 
     public void Move(Vector3 move) {
         body.MovePosition(body.position + move * speed * Time.fixedDeltaTime);
     }
 
-
     public void Jump() {
-        body.AddForce(Vector3.up * Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y), ForceMode.VelocityChange);
+        if(isGrounded){
+            body.AddForce(Vector3.up * Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y), ForceMode.VelocityChange);
+        }
+        
     }
 
     public void Dash() {
-        Vector3 dashVelocity = new Vector3(lastDirection.x, 0f, 0f) * dashForce;
-        if(inputs.magnitude > 0.1f){
-            dashVelocity = inputs * dashForce;
+        if (remainingDashes > 0) {
+            dashTimer = 0.1f;
+            dashDirection = inputs.x;
+            remainingDashes--;
+            
+        
+            Vector3 dashVelocity = new Vector3(lastDirection.x, 0f, 0f) * dashForce;
+            if(inputs.magnitude > 0.1f){
+                dashVelocity = inputs * dashForce;
+            }
+            body.velocity = Vector3.zero;
+            body.AddForce(dashVelocity, ForceMode.VelocityChange);
+            Debug.Log("Dash");
         }
-        body.velocity = Vector3.zero;
-        body.AddForce(dashVelocity, ForceMode.VelocityChange);
-        Debug.Log("Dash");
     }
 
-    public void Attack(Vector3 direction) {
+    public void setAttack(InputAction.CallbackContext context){
+        if (context.performed) {
+            Debug.Log("Attack");
+            if (attackCooldown <= 0f) {
+                attackCooldown = 1f / attackSpeed;
+                Attack(inputs);
+            }
+        }
+    }
+    public void Attack(Vector2 direction) {
         float Xdir = direction.x;
         if(Xdir > 0.7f){
             Xdir = 1f;
@@ -217,9 +204,18 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     public void UltimateAttack() {
         throw new System.NotImplementedException();
     }
+    public void Block(InputAction.CallbackContext context) {
+        if (context.started) {
+            Debug.Log("startBlock");
+            isBlocking = true;
+            animator.SetBool("isMoving", false);
+            shield.GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
+        } else if (context.canceled) {
+            Debug.Log("stopBlock");
+            isBlocking = false;
+            shield.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
+        }
 
-    public void Block() {
-        isBlocking = true;
     }
 
     public void Taunt() {
@@ -227,6 +223,11 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public float Heal(float amount){
+        takenDamage -= amount;
+        if(takenDamage<0f){
+            takenDamage = 0f;
+        }
+        uiManager.setDamage(takenDamage);
         return amount;
     }
 
@@ -235,8 +236,6 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         // Attaque de côté opposé au shield: (transform.position - origin).x * (shield.position - transform.position).x POSITIF
         if (!isBlocking || (transform.position - origin).x * (shield.position - transform.position).x > 0) {
             takenDamage += amount - amount * (resistance / 100);
-
-            /***/
             Vector3 direction = new Vector3(centerOfMass.position.x - origin.x, 0f, 0f).normalized;
             if(projection.y == 0f){
                 direction = new Vector3(centerOfMass.position.x - origin.x, 0f, 0f).normalized;
@@ -245,18 +244,12 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
                 direction = new Vector3(projection.x, projection.y, 0f).normalized;
             }
             Debug.Log(direction);
-
-            direction *= (1 + takenDamage) * (weight / 100);
+            direction *= (4 * (1 + takenDamage/100f)) / (weight / 100);
             Debug.Log(takenDamage);
-            // Add pushForce;
             body.AddForce(direction, ForceMode.VelocityChange);
-            //(1+takenDamage) * weight/100
-
-            /***/
-            Debug.Log("Target takes a " + amount + " hit.");
+            uiManager.setDamage(takenDamage);
             return amount;
         } else {
-            Debug.Log("Target blocks a " + amount + " hit.");
             return 0;
         }
     }
@@ -265,6 +258,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         //checkForLivesLeft
         //Respawn
         takenDamage = 0f;
+        uiManager.setDamage(takenDamage);
         body.velocity = new Vector3(0f, body.velocity.y, body.velocity.z);
         body.angularVelocity = new Vector3(0f, body.angularVelocity.y, body.angularVelocity.z);
         transform.position = new Vector3(0f, 10f, 0f);

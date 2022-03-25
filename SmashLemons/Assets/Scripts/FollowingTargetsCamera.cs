@@ -52,7 +52,8 @@ public class FollowingTargetsCamera : MonoBehaviour
             Vector3 position = new Vector3(xValue, yValue, 0f);
             bounds.Encapsulate(position);
         }
-        return bounds.size.x;
+        
+        return Mathf.Sqrt(bounds.size.x * bounds.size.x + (bounds.size.y+1f) * (bounds.size.y+1f));
     }
 
     Vector3 GetCenterPoint(){
