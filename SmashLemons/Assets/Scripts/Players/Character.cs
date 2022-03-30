@@ -47,6 +47,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 
     float dashDirection;
     public PlayerUIManager uiManager;
+    public PlayerSounds playerSounds;
 
     private void Awake() {
         this.speed = 5f;
@@ -154,7 +155,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public void setAttack(InputAction.CallbackContext context){
-        if (context.performed) {
+        if (context.performed && !isBlocking) {
             Debug.Log("Attack");
             if (attackCooldown <= 0f) {
                 attackCooldown = 1f / attackSpeed;
@@ -163,6 +164,8 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         }
     }
     public void Attack(Vector2 direction) {
+        animator.Play("BasicAttack", 1, 0.3f);
+        playerSounds.PlayAttack();
         float Xdir = direction.x;
         if(Xdir > 0.7f){
             Xdir = 1f;
@@ -247,6 +250,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
             direction *= (4 * (1 + takenDamage/100f)) / (weight / 100);
             Debug.Log(takenDamage);
             body.AddForce(direction, ForceMode.VelocityChange);
+            playerSounds.PlayHit();
             uiManager.setDamage(takenDamage);
             return amount;
         } else {

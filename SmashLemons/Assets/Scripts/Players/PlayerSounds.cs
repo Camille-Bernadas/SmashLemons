@@ -24,6 +24,8 @@ public class PlayerSounds : MonoBehaviour
     }
     
     public void PlayAttack() {
+        float pitch = Random.Range(0.7f, 1.3f);
+        middleAudioSource.pitch = pitch;
         middleAudioSource.PlayOneShot(basicAttack);
     }
     public void PlaySpecialAttack() {
