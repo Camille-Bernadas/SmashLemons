@@ -77,6 +77,8 @@ public class GameManager : MonoBehaviour
             currentImage.color = new Color(1f, 1f, 1f, 0.95f);
             playerDatas[i].transform.GetComponent<Image>().color = colors[i];
         }
+        PlayerInput.all[0].SwitchCurrentControlScheme("PlayerOne", Keyboard.current);
+        PlayerInput.all[1].SwitchCurrentControlScheme("PlayerTwo", Keyboard.current);
         camera.GetComponent<FollowingTargetsCamera>().SetUpList();
     }
 

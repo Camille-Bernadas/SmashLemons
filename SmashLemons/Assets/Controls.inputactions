@@ -67,7 +67,7 @@
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": "PlayerTwo",
+                    "groups": "PlayerThree",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -128,12 +128,67 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "2D Vector",
+                    "id": "f02854a0-364c-4c65-a24d-ed50810499e7",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "3f34c673-a5d5-47b8-8757-596c1f712a47",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "7a3e878b-3559-4218-8f74-332c172b37fa",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "a8794014-9d64-46ff-a1b1-af21ae556c99",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "e3665177-0efe-4aa7-a6d9-33552145ff36",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "cf153203-eb1c-4f8b-a36c-0b35f8359d7c",
                     "path": "<Gamepad>/buttonSouth",
                     "interactions": "Press",
                     "processors": "",
-                    "groups": "PlayerTwo",
+                    "groups": "PlayerThree",
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -145,6 +200,17 @@
                     "interactions": "Press",
                     "processors": "",
                     "groups": "PlayerOne",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c3aab0f5-bbcc-4d88-8799-732e0c7ad709",
+                    "path": "<Keyboard>/numpad4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -165,6 +231,17 @@
                     "id": "3c52ba39-09d5-4383-9494-15c5960b409b",
                     "path": "<Gamepad>/buttonWest",
                     "interactions": "Press",
+                    "processors": "",
+                    "groups": "PlayerThree",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6b7fdd4b-dea5-4a63-b1e2-da0ae7e41779",
+                    "path": "<Keyboard>/numpad5",
+                    "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
                     "action": "Dash",
@@ -188,6 +265,17 @@
                     "path": "<Gamepad>/rightTrigger",
                     "interactions": "Press",
                     "processors": "",
+                    "groups": "PlayerThree",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3cd94fb8-b386-4dcc-ae54-b9c22c7051d9",
+                    "path": "<Keyboard>/numpad7",
+                    "interactions": "",
+                    "processors": "",
                     "groups": "PlayerTwo",
                     "action": "Attack",
                     "isComposite": false,
@@ -209,6 +297,17 @@
                     "id": "07509955-38f3-4de1-924e-2846770aba54",
                     "path": "<Gamepad>/leftTrigger",
                     "interactions": "Hold",
+                    "processors": "",
+                    "groups": "PlayerThree",
+                    "action": "Block",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1aa806c9-584b-4612-aaf7-494de970713a",
+                    "path": "<Keyboard>/numpad9",
+                    "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
                     "action": "Block",
@@ -243,6 +342,17 @@
                     "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
+                    "groups": "PlayerThree",
+                    "action": "PauseGame",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b1b9d907-18a8-4896-aa07-1929df03a667",
+                    "path": "<Keyboard>/numpad0",
+                    "interactions": "",
+                    "processors": "",
                     "groups": "PlayerTwo",
                     "action": "PauseGame",
                     "isComposite": false,
@@ -264,8 +374,8 @@
             ]
         },
         {
-            "name": "PlayerTwo",
-            "bindingGroup": "PlayerTwo",
+            "name": "PlayerThree",
+            "bindingGroup": "PlayerThree",
             "devices": [
                 {
                     "devicePath": "<Gamepad>",
@@ -275,8 +385,8 @@
             ]
         },
         {
-            "name": "PlayerThree",
-            "bindingGroup": "PlayerThree",
+            "name": "PlayerTwo",
+            "bindingGroup": "PlayerTwo",
             "devices": [
                 {
                     "devicePath": "<Keyboard>",
