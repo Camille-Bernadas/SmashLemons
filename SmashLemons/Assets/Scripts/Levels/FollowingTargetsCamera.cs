@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class FollowingTargetsCamera : MonoBehaviour
 {
-    public List<Transform> targets;
+    private List<Transform> targets = new List<Transform>();
     public Transform bottomLeft;
     public Transform topRight;
     public Vector3 offset = new Vector3(0f, 1f, -6f);
@@ -18,6 +18,14 @@ public class FollowingTargetsCamera : MonoBehaviour
     private Camera cam;
     private void Start() {
         cam = GetComponent<Camera>();
+        
+    }
+
+    public void SetUpList(){
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        for (int i = 0; i < players.Length; i++) {
+            targets.Add(players[i].transform);
+        }
     }
 
     void LateUpdate()
@@ -73,5 +81,9 @@ public class FollowingTargetsCamera : MonoBehaviour
             bounds.Encapsulate(position);
         }
         return bounds.center;
+    }
+
+    public void RemoveTarget(Transform item){
+        targets.Remove(item);
     }
 }

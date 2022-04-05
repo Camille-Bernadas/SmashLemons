@@ -28,6 +28,11 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     protected float resistance;
     protected float takenDamage;
 
+    /* Life-Related */
+    protected int remainingLives;
+    public GameObject respawnParticle;
+    protected bool isAlive = true;
+
 
     /* References to other objects */
     protected Rigidbody body;
@@ -46,7 +51,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     private Vector3 lastDirection;
 
     float dashDirection;
-    public PlayerUIManager uiManager;
+
     public PlayerSounds playerSounds;
 
     private void Awake() {
@@ -55,13 +60,14 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         this.dashForce = 4f;
         this.weight = 100f;
         this.resistance = 0f;
-        this.attackDamage = 20f;
+        this.attackDamage = 60f;
         this.attackSpeed = 2f;
         this.specialSpeed = 1f;
         this.ultimateProgression = 0f;
         this.isBlocking = false;
         this.isGrounded = false;
         this.maxDashes = 2;
+        this.remainingLives = 3;
     } 
     void Start() {
         body = GetComponent<Rigidbody>();
@@ -73,6 +79,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     void Update() {
+        if (!isAlive) { return; }
         isGrounded = Physics.CheckSphere(groundChecker.position, GroundDistance, Ground, QueryTriggerInteraction.Ignore);
         if (isGrounded) {
             if (dashTimer <= 0f) {
@@ -84,8 +91,11 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         }
 
         inputs = inputs.normalized;
+        if(isBlocking){
+            inputs = new Vector3(0f, 0f, 0f);
+        }
 
-        if(!isBlocking){
+        if(true){
             Vector3 direction = new Vector3(inputs.x, 0f/*vertical*/, 0f).normalized;
             if (Mathf.Abs(inputs.x) >= 0.1f) {
                 lastDirection = new Vector3(inputs.x, 0f, 0f);
@@ -118,7 +128,8 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 
 
     void FixedUpdate() {
-        if (!isBlocking) {
+        if (!isAlive) { return; }
+        if (true) {
             Vector3 move = new Vector3(inputs.x, 0f, 0f);
             Move(move);
         }
@@ -127,10 +138,13 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     public void OnMove(InputAction.CallbackContext ctx) => inputs = ctx.ReadValue<Vector2>();
 
     public void Move(Vector3 move) {
+        if (!isAlive) { return; }
         body.MovePosition(body.position + move * speed * Time.fixedDeltaTime);
     }
 
     public void Jump() {
+
+        if (!isAlive) { return; }
         if(isGrounded){
             body.AddForce(Vector3.up * Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y), ForceMode.VelocityChange);
         }
@@ -138,6 +152,8 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public void Dash() {
+        if (!isAlive) { return; }
+
         if (remainingDashes > 0) {
             dashTimer = 0.1f;
             dashDirection = inputs.x;
@@ -150,13 +166,10 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
             }
             body.velocity = Vector3.zero;
             body.AddForce(dashVelocity, ForceMode.VelocityChange);
-            Debug.Log("Dash");
         }
     }
-
     public void setAttack(InputAction.CallbackContext context){
         if (context.performed && !isBlocking) {
-            Debug.Log("Attack");
             if (attackCooldown <= 0f) {
                 attackCooldown = 1f / attackSpeed;
                 Attack(inputs);
@@ -164,6 +177,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         }
     }
     public void Attack(Vector2 direction) {
+        if (!isAlive) { return; }
         animator.Play("BasicAttack", 1, 0.3f);
         playerSounds.PlayAttack();
         float Xdir = direction.x;
@@ -196,45 +210,47 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
             if(hitCollider.tag == "Player" && hitCollider.name != transform.name){
                 hitCollider.transform.GetComponent<Character>().TakeDamage(meleeRange.position, projectionVector, attackDamage);
             }
-            
         }
     }
 
     public void SpecialAttack() {
+        if (!isAlive) { return; }
         throw new System.NotImplementedException();
     }
 
     public void UltimateAttack() {
+        if (!isAlive) { return; }
         throw new System.NotImplementedException();
     }
+
     public void Block(InputAction.CallbackContext context) {
+        if (!isAlive) { return; }
         if (context.started) {
-            Debug.Log("startBlock");
             isBlocking = true;
             animator.SetBool("isMoving", false);
             shield.GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
         } else if (context.canceled) {
-            Debug.Log("stopBlock");
             isBlocking = false;
             shield.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
         }
-
     }
 
     public void Taunt() {
+        if (!isAlive) { return; }
         throw new System.NotImplementedException();
     }
 
     public float Heal(float amount){
+        if (!isAlive) { return 0f; }
         takenDamage -= amount;
         if(takenDamage<0f){
             takenDamage = 0f;
         }
-        uiManager.setDamage(takenDamage);
         return amount;
     }
 
     public float TakeDamage(Vector3 origin, Vector3 projection, float amount) {
+        if (!isAlive) { return 0f; }
         // Attaque du côté du shield: (transform.position - origin).x * (shield.position - transform.position).x NEGATIF
         // Attaque de côté opposé au shield: (transform.position - origin).x * (shield.position - transform.position).x POSITIF
         if (!isBlocking || (transform.position - origin).x * (shield.position - transform.position).x > 0) {
@@ -246,12 +262,11 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
             else{
                 direction = new Vector3(projection.x, projection.y, 0f).normalized;
             }
-            Debug.Log(direction);
             direction *= (4 * (1 + takenDamage/100f)) / (weight / 100);
-            Debug.Log(takenDamage);
             body.AddForce(direction, ForceMode.VelocityChange);
+
             playerSounds.PlayHit();
-            uiManager.setDamage(takenDamage);
+
             return amount;
         } else {
             return 0;
@@ -259,13 +274,63 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public void Die() {
+        if (!isAlive) { return; }
         //checkForLivesLeft
-        //Respawn
+        remainingLives--;
         takenDamage = 0f;
-        uiManager.setDamage(takenDamage);
         body.velocity = new Vector3(0f, body.velocity.y, body.velocity.z);
         body.angularVelocity = new Vector3(0f, body.angularVelocity.y, body.angularVelocity.z);
         transform.position = new Vector3(0f, 10f, 0f);
+        if(remainingLives > 0){
+            Respawn();
+        }
+        else{
+            isAlive = false;
+            body.useGravity = false;
+            body.velocity = new Vector3(0f, 0f, 0f);
+            body.angularVelocity = new Vector3(0f, 0f, 0f);
+            transform.position = new Vector3(-100f, -100f, -100f);
+        }
+    }
+    public void Spawn(){
+        if (!isAlive) { return; }
+        //Choose Respawn Position
+        Vector3 respawnPosition;
+        GameObject[] respawns = GameObject.FindGameObjectsWithTag("Respawn");
+        if (respawns.Length == 0) {
+            respawnPosition = new Vector3(0f, 10f, 0f);
+        } else {
+            int chosenRespawn = Random.Range(0, respawns.Length);
+            respawnPosition = respawns[chosenRespawn].transform.position;
+        }
+        transform.position = respawnPosition;
+    }
+    public void Respawn(){
+        if (!isAlive) { return; }
+        //Choose Respawn Position
+        Vector3 respawnPosition;
+        
+        GameObject[] respawns = GameObject.FindGameObjectsWithTag("Respawn");
+        if (respawns.Length == 0) {
+            respawnPosition = new Vector3(0f, 10f, 0f);
+        } else {
+            int chosenRespawn = Random.Range(0, respawns.Length);
+            respawnPosition = respawns[chosenRespawn].transform.position;
+        }
+        //Respawn
+        body.velocity = new Vector3(0f, 0f, 0f);
+        body.angularVelocity = new Vector3(0f, 0f, 0f);
+        transform.position = respawnPosition;
+        Instantiate(respawnParticle, transform.position, Quaternion.identity).GetComponent<ParticleSystem>().Play();
+    }
+    public float getTakenDamage() {
+        return takenDamage;
+    }
+    public int getRemainingLives() {
+        return remainingLives;
+    }
 
+    public void setAlive(bool alive){
+        isAlive = alive;
     }
 }

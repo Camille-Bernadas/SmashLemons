@@ -6,7 +6,7 @@ public class Catherine : Character {
     private void Awake() {
         this.speed = 8f;
         this.jumpForce = 1f;
-        this.dashForce = 1f;
+        this.dashForce = 3f;
         this.weight = 50f;
         this.resistance = 50f;
         this.attackDamage = 5f;
@@ -16,5 +16,6 @@ public class Catherine : Character {
         this.isBlocking = false;
         this.isGrounded = false;
         this.maxDashes = 5;
+        this.remainingLives = 3;
     }
 }

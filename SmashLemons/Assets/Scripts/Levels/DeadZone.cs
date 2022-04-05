@@ -5,9 +5,7 @@ using UnityEngine;
 public class DeadZone : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other) {
-        Debug.Log("Collide");
         if(other.tag == "Player"){
-            Debug.Log("isPlayer");
             other.GetComponent<Character>().Die();
         }
     }
