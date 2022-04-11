@@ -127,14 +127,22 @@ public class GameManager : MonoBehaviour
                 winner = i;
                 break;
             }
-        }
-        ;
+        };
+        
         timer.text = "Game over";
         players[winner].setAlive(false);
         canvas.gameObject.SetActive(false);
         gameOverCanvas.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "Game Over, "+players[winner].gameObject.name +" WON !";
         gameOverCanvas.gameObject.SetActive(true);
-        StartCoroutine(ReloadLevel());
+        long winnerPoints = players[winner].getPoints();
+        if (SaveData.getInstance().leaderboard.isHigh(winnerPoints)) {
+            SaveData.getInstance().lastScore = winnerPoints;
+            StartCoroutine(WriteHighScore());
+        }
+        else{
+            StartCoroutine(ReloadLevel());
+        }
+        
     }
 
     IEnumerator ReloadLevel() {
@@ -142,6 +150,12 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(5);
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    IEnumerator WriteHighScore() {
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSeconds(5);
+
+        SceneManager.LoadScene("newHighScore");
     }
 
     public void pause(InputAction.CallbackContext context){

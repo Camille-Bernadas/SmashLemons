@@ -21,6 +21,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     protected float specialSpeed;
     protected float ultimateProgression;
     protected float attackCooldown;
+    protected long points;
 
     /* Defense */
     protected bool isBlocking;
@@ -68,6 +69,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         this.isGrounded = false;
         this.maxDashes = 2;
         this.remainingLives = 3;
+        this.points = 0;
     } 
     void Start() {
         body = GetComponent<Rigidbody>();
@@ -208,6 +210,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         Collider[] hitColliders = Physics.OverlapSphere(meleeRange.position, 0.3f);
         foreach (var hitCollider in hitColliders) {
             if(hitCollider.tag == "Player" && hitCollider.name != transform.name){
+                this.points += (long)attackDamage;
                 hitCollider.transform.GetComponent<Character>().TakeDamage(meleeRange.position, projectionVector, attackDamage);
             }
         }
@@ -332,5 +335,9 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 
     public void setAlive(bool alive){
         isAlive = alive;
+    }
+
+    public long getPoints(){
+        return points;
     }
 }
