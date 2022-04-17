@@ -6,5 +6,5 @@ public class CharacterInfo : MonoBehaviour
 {
     public int posX;
     public int posY;
-    public string characterId;
+    public int characterId;
 }

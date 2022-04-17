@@ -206,6 +206,8 @@ public class SelectScreenManager : MonoBehaviour
         player.SelectorPlayer.SetActive(true); //enable the selector
         player.activeC = charGrid[player.activeX, player.activeY]; // find the active character
         
+        //player.selector.modifyImage(player.activeC.characterId);
+        
         Vector2 selectorPosition = player.activeC.transform.localPosition;
         selectorPosition = selectorPosition + new Vector2(characterCanvas.transform.localPosition.x, characterCanvas.transform.localPosition.y);
 
@@ -282,6 +284,7 @@ public class SelectScreenManager : MonoBehaviour
         public CharacterInfo activeC;
         public CharacterInfo previewC;
         public GameObject SelectorPlayer;
+        public GameObject Player;
         public Transform charVis;
 
         public int characterValue;
