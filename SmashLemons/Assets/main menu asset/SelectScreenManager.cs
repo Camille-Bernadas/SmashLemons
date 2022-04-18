@@ -250,9 +250,9 @@ public class SelectScreenManager : MonoBehaviour
         {
             for(int i = 0; i < playerInterfaces.Count; i++)
             {
-                SaveData.getInstance().isActives[i] = playerInterfaces[i].isActive;
-                SaveData.getInstance().isPlayers[i] = playerInterfaces[i].isPlayer;
-                SaveData.getInstance().charaterId[i] = playerInterfaces[i].characterValue;
+                SaveData.getInstance().playersLoaded[i] = playerInterfaces[i].isActive;
+                SaveData.getInstance().playerNotAI[i] = playerInterfaces[i].isPlayer;
+                SaveData.getInstance().charactersID[i] = playerInterfaces[i].characterValue;
             }
         }
     }
