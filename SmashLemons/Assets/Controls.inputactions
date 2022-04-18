@@ -196,7 +196,7 @@
                 {
                     "name": "",
                     "id": "8ff41e66-99c2-4b7c-9409-a84cfee7779d",
-                    "path": "<Keyboard>/h",
+                    "path": "<Keyboard>/f",
                     "interactions": "Press",
                     "processors": "",
                     "groups": "PlayerOne",
@@ -207,7 +207,7 @@
                 {
                     "name": "",
                     "id": "c3aab0f5-bbcc-4d88-8799-732e0c7ad709",
-                    "path": "<Keyboard>/numpad4",
+                    "path": "<Keyboard>/j",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -218,7 +218,7 @@
                 {
                     "name": "",
                     "id": "fed21973-0171-448c-87a4-3371c41e9bd5",
-                    "path": "<Keyboard>/j",
+                    "path": "<Keyboard>/g",
                     "interactions": "Press",
                     "processors": "",
                     "groups": "PlayerOne",
@@ -240,7 +240,7 @@
                 {
                     "name": "",
                     "id": "6b7fdd4b-dea5-4a63-b1e2-da0ae7e41779",
-                    "path": "<Keyboard>/numpad5",
+                    "path": "<Keyboard>/k",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -251,7 +251,7 @@
                 {
                     "name": "",
                     "id": "a8c50677-c2b7-489d-82db-1601bd7c9596",
-                    "path": "<Keyboard>/y",
+                    "path": "<Keyboard>/r",
                     "interactions": "Press",
                     "processors": "",
                     "groups": "PlayerOne",
@@ -273,7 +273,7 @@
                 {
                     "name": "",
                     "id": "3cd94fb8-b386-4dcc-ae54-b9c22c7051d9",
-                    "path": "<Keyboard>/numpad7",
+                    "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -284,7 +284,7 @@
                 {
                     "name": "",
                     "id": "9a4dd520-383d-4375-b26b-ceb3256c60a2",
-                    "path": "<Keyboard>/i",
+                    "path": "<Keyboard>/y",
                     "interactions": "Hold",
                     "processors": "",
                     "groups": "PlayerOne",
@@ -306,7 +306,7 @@
                 {
                     "name": "",
                     "id": "1aa806c9-584b-4612-aaf7-494de970713a",
-                    "path": "<Keyboard>/numpad9",
+                    "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -328,7 +328,7 @@
                 {
                     "name": "",
                     "id": "7eeaf8cd-017c-48cf-98ea-911605ba5370",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/z",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerOne",
@@ -350,7 +350,7 @@
                 {
                     "name": "",
                     "id": "b1b9d907-18a8-4896-aa07-1929df03a667",
-                    "path": "<Keyboard>/numpad0",
+                    "path": "<Keyboard>/b",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -381,6 +381,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Cancel",
+                    "type": "Button",
+                    "id": "78838fd9-5d08-4fd7-b022-483f474586f0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -401,7 +410,7 @@
                     "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "PlayerOne",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -412,7 +421,7 @@
                     "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "PlayerOne",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -423,7 +432,7 @@
                     "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "PlayerOne",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -434,7 +443,62 @@
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
+                    "groups": "PlayerOne",
+                    "action": "Navigate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Keyboard",
+                    "id": "cbbd948d-c454-45cb-b2cf-3baf5d110a15",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
                     "groups": "",
+                    "action": "Navigate",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "75c782c8-67cc-459f-a971-a0938753b5ee",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
+                    "action": "Navigate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "536fadcb-c149-46ce-a2ba-2499d234cc09",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
+                    "action": "Navigate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "585b9d51-5040-4d10-9c94-b35e34103a02",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
+                    "action": "Navigate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "388f29e8-e688-4ff7-b368-cd297266e283",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -442,10 +506,10 @@
                 {
                     "name": "",
                     "id": "d338e81e-79f0-4504-bcd7-33a5b2760293",
-                    "path": "<Keyboard>/t",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "PlayerOne",
                     "action": "Confirm",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -453,11 +517,33 @@
                 {
                     "name": "",
                     "id": "ee673367-2240-4997-b492-52382f470b50",
-                    "path": "<Keyboard>/numpad7",
+                    "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "PlayerTwo",
                     "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8e62abbd-a056-43a9-a7ae-a476f7a101d8",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerOne",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e5d5d4f7-8bdc-48f5-be30-f1cc9f8dcb45",
+                    "path": "<Keyboard>/j",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerTwo",
+                    "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 
 public class SelectScreenManager : MonoBehaviour
 {
-    public int numberOfPlayer; //nombre de joueur
     public List<PlayerInterfaces> playerInterfaces = new List<PlayerInterfaces>(); //liste des personnages survoler/selectionner des joueurs (+autre info)
     public CharacterInfo[] CharacterList; // liste des cases contenant les personnage
     public DisplayPlayerSelectorScript[] PlayerList;
@@ -59,6 +59,9 @@ public class SelectScreenManager : MonoBehaviour
                 x++;
             }
         }
+
+        GameObject.Find("PreviewPlayer1").GetComponent<PlayerInput>().SwitchCurrentControlScheme("PlayerOne", Keyboard.current);
+        GameObject.Find("PreviewPlayer2").GetComponent<PlayerInput>().SwitchCurrentControlScheme("PlayerTwo", Keyboard.current);
     }
 
     // Update is called once per frame
@@ -104,7 +107,7 @@ public class SelectScreenManager : MonoBehaviour
         bool allSet = true;
         for(int i = 0; i < playerInterfaces.Count; i++)
         {
-            if(playerInterfaces[i].characterValue == 0)
+            if(playerInterfaces[i].characterValue == 0 && playerInterfaces[i].isPlayer)
             {
                 allSet = false;
                 break;
@@ -139,7 +142,7 @@ public class SelectScreenManager : MonoBehaviour
         {
             if(playerInterfaces[i].isActive)
             {
-                if(!playerInterfaces[i].isPlayer)
+                if(!playerInterfaces[i].isPlayer || playerInterfaces[i].characterValue == -1)
                 {
                     playerInterfaces[i].characterValue = Random.Range(1, 3);
                 }
@@ -148,8 +151,8 @@ public class SelectScreenManager : MonoBehaviour
 
         PrepareData();
 
-        yield return new WaitForSeconds(2);
-        SceneManager.LoadScene("SampleScene"/*remplir ici la scene a jeu*/);
+        yield return new WaitForSeconds(0);
+        SceneManager.LoadScene(1/*remplir ici la scene a jeu*/);
     }
 
     void PrepareData()//enregistrer la valeur de chaque playerInterfaces (isPlayer, isActive, characterValue) dans saveData
@@ -167,7 +170,7 @@ public class SelectScreenManager : MonoBehaviour
 
     public void onMove(int playerID, int horizontal, int vertical)
     {
-        if(playerInterfaces[playerID].isPlayer == true)
+        if(playerInterfaces[playerID].isPlayer == true && playerInterfaces[playerID].characterValue == 0)
         {
             if(vertical != 0) // verifie si modification sur l'axe Y
             {
@@ -195,7 +198,7 @@ public class SelectScreenManager : MonoBehaviour
                 {
                     if(playerInterfaces[playerID].activeX > -1)
                     {
-                        playerInterfaces[playerID].activeY = (playerInterfaces[playerID].activeY > 0) ? playerInterfaces[playerID].activeY -1: maxY-1;;
+                        playerInterfaces[playerID].activeY = (playerInterfaces[playerID].activeY > 0) ? playerInterfaces[playerID].activeY -1: maxY-3;;
                     }
                     else
                     {
@@ -206,7 +209,7 @@ public class SelectScreenManager : MonoBehaviour
                 {
                     if(playerInterfaces[playerID].activeX > -1)
                     {
-                        playerInterfaces[playerID].activeY = (playerInterfaces[playerID].activeY < maxY -1) ? playerInterfaces[playerID].activeY + 1 : 0;
+                        playerInterfaces[playerID].activeY = (playerInterfaces[playerID].activeY < maxY -3) ? playerInterfaces[playerID].activeY + 1 : 0;
                     }
                     else
                     {
@@ -214,7 +217,7 @@ public class SelectScreenManager : MonoBehaviour
                     }
                 }
             }
-            Debug.Log(playerInterfaces[playerID].activeX + " , " + playerInterfaces[playerID].activeY);
+            //Debug.Log(playerInterfaces[playerID].activeX + " , " + playerInterfaces[playerID].activeY);
         }
     }
 
@@ -252,7 +255,7 @@ public class SelectScreenManager : MonoBehaviour
         {
             if(playerID == 0)
             {
-                SceneManager.LoadScene("SampleScene"/*remplir ici la scene de menu pour retour en arriere*/);
+                SceneManager.LoadScene(0/*remplir ici la scene de menu pour retour en arriere*/);
             }
         }
     }

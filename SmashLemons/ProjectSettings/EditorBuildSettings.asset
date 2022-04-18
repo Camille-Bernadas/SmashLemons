@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LeaderBoard.unity
     guid: 6903490dab3eda14eb9a40d86832a47f
+  - enabled: 1
+    path: Assets/Scenes/CharacterSelectionCharacterSelection.unity
+    guid: da49a37d5386703489c07753f6611410
   m_configObjects: {}

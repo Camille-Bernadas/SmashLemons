@@ -16,12 +16,8 @@ public class DisplayPlayerSelectorScript : MonoBehaviour
 
     public float timerToReset = 0f;
 
-    void start()
-    {
-        PlayerInput.all[0].SwitchCurrentControlScheme("PlayerOne", Keyboard.current);
-    }
-
     private void Update() {
+        
         if (timerToReset > 0f)
         {
             timerToReset -= Time.deltaTime;
@@ -30,35 +26,46 @@ public class DisplayPlayerSelectorScript : MonoBehaviour
 
     public void onMove(InputAction.CallbackContext ctx)
     {
-        if (timerToReset <= 0f)
-        {
-            timerToReset  = 0.1f;
-            Vector2 navigation = ctx.ReadValue<Vector2>();
-            if (navigation.x > navigation.y && navigation.x > 0f)
+        if(ctx.performed){
+            if (timerToReset <= 0f)
             {
-                manager.onMove(playerID, 1, 0);
-            }
-            if (navigation.y > navigation.x && navigation.y > 0f)
-            {
-                manager.onMove(playerID, 0, 1);
-            }
-            if (navigation.x > navigation.y && navigation.y < 0f)
-            {
-                manager.onMove(playerID, 0, -1);
-            }
-            if (navigation.y > navigation.x && navigation.x < 0f)
-            {
-                manager.onMove(playerID, -1, 0);
+                timerToReset  = 0.1f;
+                Vector2 navigation = ctx.ReadValue<Vector2>();
+                if (navigation.x > navigation.y && navigation.x > 0f)
+                {
+                    manager.onMove(playerID, 1, 0);
+                }
+                if (navigation.y > navigation.x && navigation.y > 0f)
+                {
+                    manager.onMove(playerID, 0, 1);
+                }
+                if (navigation.x > navigation.y && navigation.y < 0f)
+                {
+                    manager.onMove(playerID, 0, -1);
+                }
+                if (navigation.y > navigation.x && navigation.x < 0f)
+                {
+                    manager.onMove(playerID, -1, 0);
+                }
             }
         }
     }
 
-    public void Validate()
+    public void Validate(InputAction.CallbackContext ctx)
     {
-        if (timerToReset <= 0f)
-        {
-            timerToReset  = 0.3f;
-            manager.Validate(playerID);
+        if (ctx.performed) {
+            if (timerToReset <= 0f) {
+                timerToReset = 0.3f;
+                manager.Validate(playerID);
+            }
+        }
+    }
+    public void Cancel(InputAction.CallbackContext ctx) {
+        if (ctx.performed) {
+            if (timerToReset <= 0f) {
+                timerToReset = 0.3f;
+                manager.Cancel(playerID);
+            }
         }
     }
 

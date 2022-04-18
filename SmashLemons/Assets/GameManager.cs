@@ -8,9 +8,9 @@ using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject prefabPlayerData, prefabCaterine, prefabKevin, prefabBalibump, prefabMelog;
+    public GameObject prefabPlayerData, prefabCaterine, prefabKevin, prefabBalibump, prefabMelog, prefabAI;
     [SerializeField]
-    private Sprite chat, kevin, balibump, golem;
+    private Sprite chat, kevin, balibump, golem, aiSprite;
 
     [SerializeField]
     private InputActionAsset controls;
@@ -26,11 +26,12 @@ public class GameManager : MonoBehaviour
     Transform playerData;
 
     Canvas canvas, gameOverCanvas;
-
+    public int amountPlayers = 4;
+    public int amountAI = 2;
     GameObject[] playerDatas = new GameObject[4];
     Character[] players = new Character[4];
     float time = 0f;
-    public int amountPlayers = 4;
+
 
     public bool togglePause = false;
     private string pauseStarter;
@@ -47,10 +48,40 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start() {
+        amountPlayers = 0;
+        amountAI = 0;
+        bool[] actives = new bool[4];
+        bool[] controlled = new bool[4];
+        int[] characters = new int[4];
+        
+        for(int i = 0; i<4; i++){
+            actives[i] = SaveData.getInstance().playersLoaded[i];
+            controlled[i] = SaveData.getInstance().playerNotAI[i];
+            if(actives[i]){
+                if(controlled[i]){
+                    amountPlayers++;
+                }
+                else{
+                    amountAI++;
+                }
+            }
+            characters[i] = SaveData.getInstance().charactersID[i];
+
+        }
+        for(int i = 0; i<4; i++){
+            SaveData.getInstance().playersLoaded[i] = false;
+            SaveData.getInstance().playerNotAI[i] = false;
+            SaveData.getInstance().charactersID[i] = -1;
+            
+        }
+
+
+
+
         for (int i = 0; i < amountPlayers; i++) {
             string controlScheme = "PlayerOne";
-            switch(i){
-                case 0:;
+            switch (i) {
+                case 0:
                     break;
                 case 1:
                     controlScheme = "PlayerTwo";
@@ -62,23 +93,91 @@ public class GameManager : MonoBehaviour
                     controlScheme = "PlayerFour";
                     break;
                 default:
-                    controlScheme = "PlayerOne";
                     break;
             }
-            //players[i] = Instantiate(prefabCaterine).transform.GetComponent<Character>();
-            GameObject character = PlayerInput.Instantiate(prefabCaterine, 0, controlScheme).gameObject;
+
+            GameObject character;
+            GameObject usedPrefab = prefabCaterine;
+
+            switch (characters[i]) {
+                case 0:
+                    usedPrefab = prefabCaterine;
+                    break;
+                case 1:
+                    usedPrefab = prefabCaterine;
+                    break;
+                case 2:
+                    usedPrefab = prefabMelog;
+                    break;
+                case 3:
+                    usedPrefab = prefabKevin;
+                    break;
+                case 4:
+                    usedPrefab = prefabBalibump;
+                    break;
+                default:
+                    break;
+            }
+        
+            character = PlayerInput.Instantiate(usedPrefab, 0, controlScheme).gameObject;
+            
+            
             character.name = "Player" + (i + 1);
             players[i] = character.transform.GetComponent<Character>();
             players[i].Spawn();
 
             playerDatas[i] = Instantiate(prefabPlayerData, playerData);
+            Outline outline = character.AddComponent<Outline>();
+
+            outline.OutlineMode = Outline.Mode.OutlineVisible;
+            outline.OutlineColor = colors[i];
+            outline.OutlineWidth = 1f;
             Image currentImage = playerDatas[i].transform.Find("Image").GetComponent<Image>();
             currentImage.sprite = chat;
+            switch (characters[i]) {
+                case 0:
+                    currentImage.sprite = chat;
+                    break;
+                case 1:
+                    currentImage.sprite = chat;
+                    break;
+                case 2:
+                    currentImage.sprite = golem;
+                    break;
+                case 3:
+                    currentImage.sprite = kevin;
+                    break;
+                case 4:
+                    currentImage.sprite = balibump;
+                    break;
+                default:
+                    break;
+            }
+
             currentImage.color = new Color(1f, 1f, 1f, 0.95f);
             playerDatas[i].transform.GetComponent<Image>().color = colors[i];
         }
+        for (int i = 0; i < amountAI; i++) {
+            
+            GameObject bot = Instantiate(prefabAI);
+            bot.name = "BOT" + (i + 1);
+            players[amountPlayers+i] = bot.transform.GetComponent<Character>();
+            players[amountPlayers+i].Spawn();
+
+            playerDatas[amountPlayers+i] = Instantiate(prefabPlayerData, playerData);
+            Outline outline = bot.AddComponent<Outline>();
+            outline.OutlineMode = Outline.Mode.OutlineVisible;
+            outline.OutlineColor = new Color(0.1f, 0.1f, 0.1f);
+            outline.OutlineWidth = 1f;
+            Image currentImage = playerDatas[amountPlayers+i].transform.Find("Image").GetComponent<Image>();
+            currentImage.sprite = aiSprite;
+            currentImage.color = new Color(1f, 1f, 1f, 0.95f);
+            playerDatas[amountPlayers+i].transform.GetComponent<Image>().color = colors[amountPlayers+i];
+        }
         PlayerInput.all[0].SwitchCurrentControlScheme("PlayerOne", Keyboard.current);
-        PlayerInput.all[1].SwitchCurrentControlScheme("PlayerTwo", Keyboard.current);
+        if(amountPlayers>1){
+            PlayerInput.all[1].SwitchCurrentControlScheme("PlayerTwo", Keyboard.current);
+        }
         camera.GetComponent<FollowingTargetsCamera>().SetUpList();
     }
 
@@ -91,14 +190,14 @@ public class GameManager : MonoBehaviour
     }
 
     private void UpdateHealth() {
-        for (int i = 0; i < amountPlayers; i++) {
+        for (int i = 0; i < amountPlayers+amountAI; i++) {
             float damage = players[i].getTakenDamage();
             playerDatas[i].transform.GetComponent<PlayerUIManager>().setDamage(damage);
         }
     }
 
     private void UpdateLives() {
-        for (int i = 0; i < amountPlayers; i++) {
+        for (int i = 0; i < amountPlayers+amountAI; i++) {
             int lives = players[i].getRemainingLives();
             playerDatas[i].transform.GetComponent<PlayerUIManager>().setLives(lives);
         }
@@ -106,7 +205,7 @@ public class GameManager : MonoBehaviour
 
     private void UpdateDead(){
         int surviving = 0;
-        for (int i = 0; i < amountPlayers; i++) {
+        for (int i = 0; i < amountPlayers+amountAI; i++) {
             if(players[i].getRemainingLives() <= 0){
                 camera.GetComponent<FollowingTargetsCamera>().RemoveTarget(players[i].transform);
                 playerDatas[i].transform.Find("Image").GetComponent<Image>().color = new Color(0.5f,0.5f,0.5f,0.5f);
@@ -122,7 +221,7 @@ public class GameManager : MonoBehaviour
 
     private void GameOver(){
         int winner = 0;
-        for (int i = 0; i < amountPlayers; i++) {
+        for (int i = 0; i < amountPlayers + amountAI; i++) {
             if (players[i].getRemainingLives() > 0) {
                 winner = i;
                 break;
@@ -145,11 +244,11 @@ public class GameManager : MonoBehaviour
         
     }
 
-    IEnumerator ReloadLevel() {
+    IEnumerator ReloadLevel() {//Loads Main Menu
         //yield on a new YieldInstruction that waits for 5 seconds.
         yield return new WaitForSeconds(5);
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(0);
     }
     IEnumerator WriteHighScore() {
         //yield on a new YieldInstruction that waits for 5 seconds.

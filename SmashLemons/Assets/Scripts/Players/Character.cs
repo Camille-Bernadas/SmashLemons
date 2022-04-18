@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 { 
@@ -18,6 +19,8 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     /* Attacks */
     protected float attackDamage;
     protected float attackSpeed;
+    protected float attackDelay;
+    protected float attackSize;
     protected float specialSpeed;
     protected float ultimateProgression;
     protected float attackCooldown;
@@ -63,6 +66,8 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         this.resistance = 0f;
         this.attackDamage = 60f;
         this.attackSpeed = 2f;
+        this.attackDelay = 0.08f;
+        this.attackSize = 0.3f;
         this.specialSpeed = 1f;
         this.ultimateProgression = 0f;
         this.isBlocking = false;
@@ -80,7 +85,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         centerOfMass = transform.Find("CenterOfMass");
     }
 
-    void Update() {
+    virtual protected void Update() {
         if (!isAlive) { return; }
         isGrounded = Physics.CheckSphere(groundChecker.position, GroundDistance, Ground, QueryTriggerInteraction.Ignore);
         if (isGrounded) {
@@ -178,19 +183,17 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
             }
         }
     }
-    public void Attack(Vector2 direction) {
-        if (!isAlive) { return; }
-        animator.Play("BasicAttack", 1, 0.3f);
-        playerSounds.PlayAttack();
+
+    private IEnumerator preAttack(Vector2 direction) {
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSeconds(attackDelay);
         float Xdir = direction.x;
-        if(Xdir > 0.7f){
+        if (Xdir > 0.7f) {
             Xdir = 1f;
-        }
-        else{
+        } else {
             if (Xdir < -0.7f) {
                 Xdir = -1f;
-            }
-            else{
+            } else {
                 Xdir = 0f;
             }
         }
@@ -209,11 +212,19 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         meleeRange.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
         Collider[] hitColliders = Physics.OverlapSphere(meleeRange.position, 0.3f);
         foreach (var hitCollider in hitColliders) {
-            if(hitCollider.tag == "Player" && hitCollider.name != transform.name){
+            if (hitCollider.tag == "Player" && hitCollider.name != transform.name) {
                 this.points += (long)attackDamage;
                 hitCollider.transform.GetComponent<Character>().TakeDamage(meleeRange.position, projectionVector, attackDamage);
             }
         }
+
+    }
+    public void Attack(Vector2 direction) {
+        if (!isAlive) { return; }
+        animator.Play("BasicAttack", 1, 0f);
+        playerSounds.PlayAttack();
+        StartCoroutine("preAttack", direction);
+        
     }
 
     public void SpecialAttack() {

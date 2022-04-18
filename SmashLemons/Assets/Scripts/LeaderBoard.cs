@@ -29,7 +29,10 @@ public class LeaderBoard
         for (int i = 9; i > replace; i--){
             scores[i] = scores[i - 1];
         }
-        scores[replace] = new Score(score, name);
+        if(replace != 10){
+            scores[replace] = new Score(score, name);
+        }
+        
     }
     public bool isHigh(long score){
         if (score > scores[9].score) {
