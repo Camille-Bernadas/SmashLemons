@@ -2,34 +2,63 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class DisplayPlayerSelectorScript : MonoBehaviour
 {
     public Image Original;
+    public SelectScreenManager manager;
 
     public int posX;
     public int posY;
-    public int playerID;
-    public bool isActive;
-    public bool isPlayer;
 
-    void Activated()
+    public int playerID;
+
+    public float timerToReset = 0f;
+
+    void start()
     {
-        if(isActive)
+        PlayerInput.all[0].SwitchCurrentControlScheme("PlayerOne", Keyboard.current);
+    }
+
+    private void Update() {
+        if (timerToReset > 0f)
         {
-            if(isPlayer)
+            timerToReset -= Time.deltaTime;
+        }
+    }
+
+    public void onMove(InputAction.CallbackContext ctx)
+    {
+        if (timerToReset <= 0f)
+        {
+            timerToReset  = 0.1f;
+            Vector2 navigation = ctx.ReadValue<Vector2>();
+            if (navigation.x > navigation.y && navigation.x > 0f)
             {
-                isPlayer = false;
+                manager.onMove(playerID, 1, 0);
             }
-            else
+            if (navigation.y > navigation.x && navigation.y > 0f)
             {
-                isActive = false;
+                manager.onMove(playerID, 0, 1);
+            }
+            if (navigation.x > navigation.y && navigation.y < 0f)
+            {
+                manager.onMove(playerID, 0, -1);
+            }
+            if (navigation.y > navigation.x && navigation.x < 0f)
+            {
+                manager.onMove(playerID, -1, 0);
             }
         }
-        else
+    }
+
+    public void Validate()
+    {
+        if (timerToReset <= 0f)
         {
-            isActive = true;
-            isPlayer = true;
+            timerToReset  = 0.3f;
+            manager.Validate(playerID);
         }
     }
 

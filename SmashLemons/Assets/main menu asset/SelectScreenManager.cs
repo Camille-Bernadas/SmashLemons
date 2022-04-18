@@ -11,17 +11,16 @@ public class SelectScreenManager : MonoBehaviour
     public List<PlayerInterfaces> playerInterfaces = new List<PlayerInterfaces>(); //liste des personnages survoler/selectionner des joueurs (+autre info)
     public CharacterInfo[] CharacterList; // liste des cases contenant les personnage
     public DisplayPlayerSelectorScript[] PlayerList;
-    public int maxX; //max ligne (on doit pouvoir faire mieux sans ces deux valeurs)
-    public int maxY; //max colone
+    public int maxX;
+    public int maxY;
     CharacterInfo[,] charGrid;
     DisplayPlayerSelectorScript[] playerGrid;
 
     public GameObject playerPreviewCanvas;
     public GameObject characterCanvas;
+    public GameObject SelectorPlayerDefault;
     bool loadLevel;
-    public bool allPlayersSelected;
 
-    public Sprite random;
     public Sprite unactive;
 
     // Start is called before the first frame update
@@ -38,15 +37,15 @@ public class SelectScreenManager : MonoBehaviour
         
         for(int i = 0; i < PlayerList.Length; i++)
         {
-            PlayerList[i].posX += -1;
-            PlayerList[i].posY += i;
+            PlayerList[i].posX = -1;
+            PlayerList[i].posY = i;
             playerGrid[i] = PlayerList[i];
         }
 
         for(int i = 0; i < CharacterList.Length; i++)
         {
-            CharacterList[i].posX += x;
-            CharacterList[i].posY += y;
+            CharacterList[i].posX = x;
+            CharacterList[i].posY = y;
             
             charGrid[x, y] = CharacterList[i];
 
@@ -73,24 +72,13 @@ public class SelectScreenManager : MonoBehaviour
                 {
                     if(playerInterfaces[i].isPlayer)
                     {
-                        if(playerInterfaces[i].timerToReset > 0f)
-                        {
-                            playerInterfaces[i].timerToReset -= Time.deltaTime;
-                        }
-                        //deselection
-                        /*
-                        if(Input.GetButtonUp("Fire2" + charManager.players[i].inputId))
-                        {
-                            playerInterfaces[i].characterValue == 0;
-                        }
-                        */
-
                         if(playerInterfaces[i].characterValue == 0)
                         {
-                            //playerInterfaces[i].playerBase = charManager.players[i]; //set up pour l'interface
-                            HandleSelectorPosition(playerInterfaces[i]); // find active portrait
-                            //HandleSelectScreenInput(playerInterfaces[i], charManager.players[i].inputId);//handleInput/player-user et info de l'id inpute
-                            HandleCharacterPreview(playerInterfaces[i], i); // gere la creation et la visualisation du portrait
+                            if(playerInterfaces[i].activeX > -1)
+                            {
+                                HandleSelectorPosition(playerInterfaces[i]); // find active portrait
+                                HandleCharacterPreview(playerInterfaces[i], i); // gere la creation et la visualisation du portrait
+                            }   
                         }
                     }
                     else//pour un ia
@@ -104,25 +92,17 @@ public class SelectScreenManager : MonoBehaviour
             }
         }
 
-        if(allPlayersSelected)
+        if(AllSet())
         {
-            Debug.Log("loading");
             StartCoroutine("LoadLevel");
             loadLevel = true;
-        }
-        else
-        {
-            if(AllSet())
-            {
-                allPlayersSelected = true;
-            }
         }
     }
 
     bool AllSet() // verifie si tout les player on selectionner leur personnages
     {
         bool allSet = true;
-        for(int i = 0; i < numberOfPlayer; i++)
+        for(int i = 0; i < playerInterfaces.Count; i++)
         {
             if(playerInterfaces[i].characterValue == 0)
             {
@@ -132,77 +112,6 @@ public class SelectScreenManager : MonoBehaviour
         }
 
         return allSet;
-    }
-
-    void HandleSelectScreenInput(PlayerInterfaces player, int playerId)
-    {
-        #region Grid Navigation
-
-        float vertical = Input.GetAxis("Vertical" + playerId);
-
-        if(vertical != 0)
-        {
-            if(!player.hitInputOnce)
-            {
-                if(vertical > 0)
-                {
-                    player.activeX = (player.activeX > -1) ? player.activeX -1: maxX-1;
-                }
-                else
-                {
-                    player.activeX = (player.activeX < maxX -1) ? player.activeX + 1 : -1;
-                }
-
-                player.timerToReset = 0;
-                player.hitInputOnce = true;
-            }
-        }
-
-        float horizontal = Input.GetAxis("Horizontal" + playerId);
-
-        if(horizontal != 0)
-        {
-            if(horizontal > 0)
-            {
-                player.activeY = (player.activeY > 0) ? player.activeY -1: maxY-1;
-            }
-            else
-            {
-                player.activeY = (player.activeY < maxY -1) ? player.activeY + 1 : 0;
-            }
-
-            player.timerToReset = 0;
-            player.hitInputOnce = true;
-        }
-
-        if(vertical == 0 && horizontal == 0)
-        {
-            player.hitInputOnce = false;
-        }
-
-        if(player.hitInputOnce)
-        {
-            player.timerToReset += Time.deltaTime;
-
-            if (player.timerToReset > 0.8f)
-            {
-                player.hitInputOnce = false;
-                player.timerToReset = 0;
-            }
-        }
-
-        #endregion
-
-        //selection
-        if(Input.GetButtonUp("Fire1" + playerId))
-        {
-            // animation de selection si affichage perso 3d ?
-
-            //
-            //player.playerBase.playerPrefab = charManager.returnCharacterWithID(player.activeC.characterId).prefab;
-
-            //player.playerBase.hasCharacter = true;
-        }
     }
 
     void HandleSelectorPosition(PlayerInterfaces player)
@@ -232,19 +141,18 @@ public class SelectScreenManager : MonoBehaviour
             {
                 if(!playerInterfaces[i].isPlayer)
                 {
-                    playerInterfaces[i].characterValue = Random.Range(1, 4);
+                    playerInterfaces[i].characterValue = Random.Range(1, 3);
                 }
             }
         }
 
-        //enregistrer la valeur de chaque playerInterfaces (isPlayer, isActive, characterValue) dans saveData
         PrepareData();
 
         yield return new WaitForSeconds(2);
         SceneManager.LoadScene("SampleScene"/*remplir ici la scene a jeu*/);
     }
 
-    void PrepareData()
+    void PrepareData()//enregistrer la valeur de chaque playerInterfaces (isPlayer, isActive, characterValue) dans saveData
     {
         if(SaveData.getInstance() != null)
         {
@@ -257,41 +165,128 @@ public class SelectScreenManager : MonoBehaviour
         }
     }
 
-    /*public void OnMove(InputAction.CallbackContext ctx)
+    public void onMove(int playerID, int horizontal, int vertical)
     {
-        switch(ctx.currentControlScheme)
+        if(playerInterfaces[playerID].isPlayer == true)
         {
-        }
-        */
-        /*
-        if (timer <= 0f) {
-            timer = 0.1f;
-            Vector2 navigation = ctx.ReadValue<Vector2>();
-            if (navigation.x > navigation.y && navigation.x > 0f) {
-                getNextLetter();
+            if(vertical != 0) // verifie si modification sur l'axe Y
+            {
+                if(vertical < 0) // verifie si haut ou base
+                {
+                    playerInterfaces[playerID].activeX = (playerInterfaces[playerID].activeX > -1) ? playerInterfaces[playerID].activeX -1: maxX-1;
+                    if(playerInterfaces[playerID].activeY > 3 && playerInterfaces[playerID].activeX == -1) // assure que sur la premiere ligne les valeurs ne depasse pas la taille max de joueur(3)
+                    {
+                        playerInterfaces[playerID].activeY = 3;
+                    }
+                }
+                else
+                {
+                    playerInterfaces[playerID].activeX = (playerInterfaces[playerID].activeX < maxX -1) ? playerInterfaces[playerID].activeX +1 : -1;
+                    if(playerInterfaces[playerID].activeY > 3 && playerInterfaces[playerID].activeX == -1)
+                    {
+                        playerInterfaces[playerID].activeY = 3;
+                    }
+                }
             }
-            if (navigation.y > navigation.x && navigation.y > 0f) {
-                texts[selectedLetter].text = getPreviousValue();
+
+            if(horizontal != 0)// verifie si modification sur l'axe x
+            {
+                if(horizontal < 0) // verifie si gauche ou droite
+                {
+                    if(playerInterfaces[playerID].activeX > -1)
+                    {
+                        playerInterfaces[playerID].activeY = (playerInterfaces[playerID].activeY > 0) ? playerInterfaces[playerID].activeY -1: maxY-1;;
+                    }
+                    else
+                    {
+                        playerInterfaces[playerID].activeY = (playerInterfaces[playerID].activeY > 0) ? playerInterfaces[playerID].activeY -1 : 3;
+                    }
+                }
+                else
+                {
+                    if(playerInterfaces[playerID].activeX > -1)
+                    {
+                        playerInterfaces[playerID].activeY = (playerInterfaces[playerID].activeY < maxY -1) ? playerInterfaces[playerID].activeY + 1 : 0;
+                    }
+                    else
+                    {
+                        playerInterfaces[playerID].activeY = (playerInterfaces[playerID].activeY < 3) ? playerInterfaces[playerID].activeY + 1 : 0;
+                    }
+                }
             }
-            if (navigation.x > navigation.y && navigation.y < 0f) {
-                texts[selectedLetter].text = getNextValue();
-            }
-            if (navigation.y > navigation.x && navigation.x < 0f) {
-                getPreviousLetter();
-            }
-        }
-    }*/
-    
-    /*
-    public void OnSelect(InputAction.CallbackContext ctx) {
-        if (timer <= 0f && ctx.performed) {
-            timer = 0.5f;
-            SaveData.getInstance().lastEnteredSurname = getString();
-            SaveData.getInstance().lastScore = (long) Random.Range(10,5000);
-            SceneManager.LoadScene("LeaderBoard");
+            Debug.Log(playerInterfaces[playerID].activeX + " , " + playerInterfaces[playerID].activeY);
         }
     }
-    */
+
+    public void Validate(int playerID)
+    {
+        if(playerInterfaces[playerID].isPlayer == true)
+        {
+            if(playerInterfaces[playerID].activeX < 0)
+            {
+                if(playerInterfaces[playerID].activeY != 0)
+                {
+                    int targetID = playerInterfaces[playerID].activeY;
+                    Debug.Log("ID : " + playerID);
+                    Activated(playerInterfaces[targetID], targetID);
+                }
+            }
+            else
+            {
+                playerInterfaces[playerID].characterValue = charGrid[playerInterfaces[playerID].activeX, playerInterfaces[playerID].activeY].characterId;
+            }
+        }
+        else
+        {
+            Activated(playerInterfaces[playerID], playerID);
+        }
+    }
+
+    public void Cancel(int playerID)
+    {
+        if(playerInterfaces[playerID].characterValue != 0)
+        {
+            playerInterfaces[playerID].characterValue = 0;
+        }
+        else
+        {
+            if(playerID == 0)
+            {
+                SceneManager.LoadScene("SampleScene"/*remplir ici la scene de menu pour retour en arriere*/);
+            }
+        }
+    }
+
+    void Activated(PlayerInterfaces player, int playerID)
+    {
+        player.activeX = 0;
+        player.activeY = 0;
+        player.activeC = charGrid[player.activeX, player.activeY];
+        if(player.isActive)
+        {
+            player.SelectorPlayer.SetActive(true); //enable the selector
+
+            Vector2 selectorPosition = SelectorPlayerDefault.transform.localPosition;
+            selectorPosition = selectorPosition + new Vector2( SelectorPlayerDefault.transform.localPosition.x,  SelectorPlayerDefault.transform.localPosition.y);
+            
+            player.SelectorPlayer.transform.localPosition = selectorPosition;
+            if(player.isPlayer)
+            {
+                player.isPlayer = false;
+            }
+            else
+            {
+                player.isActive = false;
+                player.characterValue = 0;
+                playerGrid[playerID].modifyImage(player.activeC.characterId, unactive);
+            }
+        }
+        else
+        {
+            player.isActive = true;
+            player.isPlayer = true;
+        }
+    }
 
     [System.Serializable]
     public class PlayerInterfaces
@@ -299,7 +294,6 @@ public class SelectScreenManager : MonoBehaviour
         public CharacterInfo activeC;
         public CharacterInfo previewC;
         public GameObject SelectorPlayer;
-        public Transform charVis;
 
         public int characterValue;
         public bool isPlayer;
@@ -307,8 +301,5 @@ public class SelectScreenManager : MonoBehaviour
         
         public int activeX;
         public int activeY;
-
-        public bool hitInputOnce;
-        public float timerToReset;
     }
 }
