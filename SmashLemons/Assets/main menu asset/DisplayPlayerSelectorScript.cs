@@ -6,48 +6,35 @@ using UnityEngine.UI;
 public class DisplayPlayerSelectorScript : MonoBehaviour
 {
     public Image Original;
-    public Sprite Catherine;
-    public Sprite Melog;
-    public Sprite Kevin;
-    public Sprite Balibump;
-    public Sprite Random;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public int posX;
+    public int posY;
+    public int playerID;
+    public bool isActive;
+    public bool isPlayer;
 
-    // Update is called once per frame
-    void Update()
+    void Activated()
     {
-        
-    }
-    
-
-    void modifyImage(int characterId)
-    {
-        switch (characterId)
+        if(isActive)
         {
-            case 1:
-                Original.sprite = Catherine;
-                break;
-
-            case 2:
-                Original.sprite = Melog;
-                break;
-
-            case 3:
-                Original.sprite = Kevin;
-                break;
-
-            case 4:
-                Original.sprite = Balibump;
-                break;
-
-            default:
-                Original.sprite = Random;
-                break;
+            if(isPlayer)
+            {
+                isPlayer = false;
+            }
+            else
+            {
+                isActive = false;
+            }
         }
+        else
+        {
+            isActive = true;
+            isPlayer = true;
+        }
+    }
+
+    public void modifyImage(int characterId, Sprite replacement)
+    {
+        Original.sprite = replacement;
     }
 }

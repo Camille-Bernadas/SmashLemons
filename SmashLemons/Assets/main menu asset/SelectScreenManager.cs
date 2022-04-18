@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 
 public class SelectScreenManager : MonoBehaviour
@@ -10,39 +11,38 @@ public class SelectScreenManager : MonoBehaviour
     public int numberOfPlayer; //nombre de joueur
     public List<PlayerInterfaces> playerInterfaces = new List<PlayerInterfaces>(); //liste des personnages survoler/selectionner des joueurs (+autre info)
     public CharacterInfo[] CharacterList; // liste des cases contenant les personnage
+    public DisplayPlayerSelectorScript[] PlayerList;
     public int maxX; //max ligne (on doit pouvoir faire mieux sans ces deux valeurs)
     public int maxY; //max colone
     CharacterInfo[,] charGrid;
+    DisplayPlayerSelectorScript[] playerGrid;
 
+    public GameObject playerPreviewCanvas;
     public GameObject characterCanvas;
     bool loadLevel;
     public bool allPlayersSelected;
-    
-    /*
-    #region Singleton
-    public static SelectScreenManager instance;
-    public static SelectScreenManager getInstance()
-    {
-        return instance;
-    }
-    #endregion
 
-    void Awake()
-    {
-        instance = this;
-    }
-    */
+    public Sprite random;
+    public Sprite unactive;
 
     // Start is called before the first frame update
     void Start()
     {
-        //charactermanager ?
-
         charGrid = new CharacterInfo[maxX, maxY];
+        playerGrid = new DisplayPlayerSelectorScript[4];
         int x = 0;
         int y = 0;
 
         CharacterList = characterCanvas.GetComponentsInChildren<CharacterInfo>();
+        PlayerList = playerPreviewCanvas.GetComponentsInChildren<DisplayPlayerSelectorScript>();
+
+        
+        for(int i = 0; i < PlayerList.Length; i++)
+        {
+            PlayerList[i].posX += -1;
+            PlayerList[i].posY += i;
+            playerGrid[i] = PlayerList[i];
+        }
 
         for(int i = 0; i < CharacterList.Length; i++)
         {
@@ -74,11 +74,15 @@ public class SelectScreenManager : MonoBehaviour
                 {
                     if(playerInterfaces[i].isPlayer)
                     {
+                        if(playerInterfaces[i].timerToReset > 0f)
+                        {
+                            playerInterfaces[i].timerToReset -= Time.deltaTime;
+                        }
                         //deselection
                         /*
                         if(Input.GetButtonUp("Fire2" + charManager.players[i].inputId))
                         {
-                            playerInterfaces[i].playerBase.hasCharacter = false;
+                            playerInterfaces[i].characterValue == 0;
                         }
                         */
 
@@ -87,13 +91,15 @@ public class SelectScreenManager : MonoBehaviour
                             //playerInterfaces[i].playerBase = charManager.players[i]; //set up pour l'interface
                             HandleSelectorPosition(playerInterfaces[i]); // find active portrait
                             //HandleSelectScreenInput(playerInterfaces[i], charManager.players[i].inputId);//handleInput/player-user et info de l'id inpute
-                            HandleCharacterPreview(playerInterfaces[i]); // gere la creation et la visualisation du portrait
+                            HandleCharacterPreview(playerInterfaces[i], i); // gere la creation et la visualisation du portrait
                         }
                     }
                     else//pour un ia
                     {
                         //Set un personnage pour les ia ? ou Alors fermer certains selector
-                        //charManager.players[i].hasCharacter = true;
+                        //pour le moment random
+                        playerInterfaces[i].characterValue = -1;
+                        HandleCharacterPreview(playerInterfaces[i], i);
                     }
                 }
             }
@@ -112,10 +118,9 @@ public class SelectScreenManager : MonoBehaviour
                 allPlayersSelected = true;
             }
         }
-        
     }
 
-    bool AllSet()
+    bool AllSet() // verifie si tout les player on selectionner leur personnages
     {
         bool allSet = true;
         for(int i = 0; i < numberOfPlayer; i++)
@@ -130,7 +135,7 @@ public class SelectScreenManager : MonoBehaviour
         return allSet;
     }
 
-    void HandleSelectScreenInput(PlayerInterfaces player, string playerId)
+    void HandleSelectScreenInput(PlayerInterfaces player, int playerId)
     {
         #region Grid Navigation
 
@@ -142,11 +147,11 @@ public class SelectScreenManager : MonoBehaviour
             {
                 if(vertical > 0)
                 {
-                    player.activeX = (player.activeX > 0) ? player.activeX -1: maxX-1;
+                    player.activeX = (player.activeX > -1) ? player.activeX -1: maxX-1;
                 }
                 else
                 {
-                    player.activeX = (player.activeX < maxX -1) ? player.activeX + 1 : 0;
+                    player.activeX = (player.activeX < maxX -1) ? player.activeX + 1 : -1;
                 }
 
                 player.timerToReset = 0;
@@ -206,56 +211,32 @@ public class SelectScreenManager : MonoBehaviour
         player.SelectorPlayer.SetActive(true); //enable the selector
         player.activeC = charGrid[player.activeX, player.activeY]; // find the active character
         
-        //player.selector.modifyImage(player.activeC.characterId);
-        
         Vector2 selectorPosition = player.activeC.transform.localPosition;
         selectorPosition = selectorPosition + new Vector2(characterCanvas.transform.localPosition.x, characterCanvas.transform.localPosition.y);
 
         player.SelectorPlayer.transform.localPosition = selectorPosition;
     }
 
-    void HandleCharacterPreview(PlayerInterfaces player)
+    void HandleCharacterPreview(PlayerInterfaces player, int i)
     {
-        //difference preview / active, changement de personnage
-        /*
-        if(player.previewC != player.activeC)
-        {
-            if(player.characterValue != null)
-            {
-                Destroy(player.createdCharacter);
-            }
-
-            GameObject go = Instantiate(CharacterManager.getInstance().returnCharacterWithID(player.activeC.characterId).prefab, player.charVisPos.position, Quaternion.identity) as GameObject;
-             
-            player.createdCharacter = go;
-
-            player.previewC = player.activeC;
-
-            if(!string.Equals(player.playerBase.playerId, charManager.players[0].playedId))
-            {
-                player.createdCharacter.GetComponent<StateManager>().lookRight = false;
-            }
-        }*/
+        playerGrid[i].modifyImage(player.activeC.characterId, charGrid[player.activeX, player.activeY].getSprite());
+        player.previewC = player.activeC;
     }
 
     
     IEnumerator LoadLevel()
     {
         //if any of the players is an AI, then assign a random character to the prefab
-        /*
-        for(int i = 0; i < charManager.players.Count; i++)
+        for(int i = 0; i < playerInterfaces.Count; i++)
         {
-            if(charManager.players[i].playerType == PlayerBase.PlayerType.ai)
+            if(playerInterfaces[i].isActive)
             {
-                if(charManager.players[i].playerPrefab == null)
+                if(!playerInterfaces[i].isPlayer)
                 {
-                    int ranValue = Random.range(0, CharacterList.Length);
-                    charManager.players[i].playerPrefab = charManager.returnCharacterWithID(CharacterList[ranValue].characterId).prefab;
-                
+                    playerInterfaces[i].characterValue = Random.Range(1, 4);
                 }
             }
         }
-        */
 
         //enregistrer la valeur de chaque playerInterfaces (isPlayer, isActive, characterValue) dans saveData
         PrepareData();
@@ -278,13 +259,49 @@ public class SelectScreenManager : MonoBehaviour
         }*/
     }
 
+    public void OnMove(InputAction.CallbackContext ctx)
+    {
+        /*
+        switch(ctx.currentControlScheme)
+        {
+        }
+        */
+        /*
+        if (timer <= 0f) {
+            timer = 0.1f;
+            Vector2 navigation = ctx.ReadValue<Vector2>();
+            if (navigation.x > navigation.y && navigation.x > 0f) {
+                getNextLetter();
+            }
+            if (navigation.y > navigation.x && navigation.y > 0f) {
+                texts[selectedLetter].text = getPreviousValue();
+            }
+            if (navigation.x > navigation.y && navigation.y < 0f) {
+                texts[selectedLetter].text = getNextValue();
+            }
+            if (navigation.y > navigation.x && navigation.x < 0f) {
+                getPreviousLetter();
+            }
+        }*/
+    }
+    
+    /*
+    public void OnSelect(InputAction.CallbackContext ctx) {
+        if (timer <= 0f && ctx.performed) {
+            timer = 0.5f;
+            SaveData.getInstance().lastEnteredSurname = getString();
+            SaveData.getInstance().lastScore = (long) Random.Range(10,5000);
+            SceneManager.LoadScene("LeaderBoard");
+        }
+    }
+    */
+
     [System.Serializable]
     public class PlayerInterfaces
     {
         public CharacterInfo activeC;
         public CharacterInfo previewC;
         public GameObject SelectorPlayer;
-        public GameObject Player;
         public Transform charVis;
 
         public int characterValue;
