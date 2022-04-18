@@ -6,6 +6,9 @@ using UnityEngine;
 public class SaveData
 {
     private static SaveData Instance;
+    public bool[] isPlayers = new bool[4];
+    public bool[] isActives = new bool[4];
+    public int[] charaterId = new int[4];
 
     public static SaveData getInstance(){
         if(Instance == null){

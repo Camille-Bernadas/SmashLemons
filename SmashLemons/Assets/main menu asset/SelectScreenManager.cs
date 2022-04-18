@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 
 public class SelectScreenManager : MonoBehaviour
@@ -247,21 +246,19 @@ public class SelectScreenManager : MonoBehaviour
 
     void PrepareData()
     {
-        /*if (SaveData.Instance != null)
+        if(SaveData.getInstance() != null)
         {
             for(int i = 0; i < playerInterfaces.Count; i++)
             {
-                //ici enregistrer pour chaque joueur dans saveData
-                bool x = playerInterfaces[i].isActive;
-                bool y = playerInterfaces[i].isPlayer;
-                int z = playerInterfaces[i].characterValue;
+                SaveData.getInstance().isActives[i] = playerInterfaces[i].isActive;
+                SaveData.getInstance().isPlayers[i] = playerInterfaces[i].isPlayer;
+                SaveData.getInstance().charaterId[i] = playerInterfaces[i].characterValue;
             }
-        }*/
+        }
     }
 
-    public void OnMove(InputAction.CallbackContext ctx)
+    /*public void OnMove(InputAction.CallbackContext ctx)
     {
-        /*
         switch(ctx.currentControlScheme)
         {
         }
@@ -282,8 +279,8 @@ public class SelectScreenManager : MonoBehaviour
             if (navigation.y > navigation.x && navigation.x < 0f) {
                 getPreviousLetter();
             }
-        }*/
-    }
+        }
+    }*/
     
     /*
     public void OnSelect(InputAction.CallbackContext ctx) {
