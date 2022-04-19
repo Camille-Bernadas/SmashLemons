@@ -683,13 +683,13 @@ MonoBehaviour:
   headAudioSource: {fileID: 3964950404026555916}
   middleAudioSource: {fileID: 3481734490512492768}
   hit: {fileID: 8300000, guid: 9357115a2c9b4f54aab02dacb38bb33b, type: 3}
-  jump: {fileID: 0}
+  jump: {fileID: 8300000, guid: 119c8cd6421a03448aba406ae5b60122, type: 3}
   taunt: {fileID: 8300000, guid: b248bad7456945e4689042fd25e54126, type: 3}
   basicAttack: {fileID: 8300000, guid: b62451449d014124b8518e793f0afa79, type: 3}
   specialAttack: {fileID: 0}
   ultimateAttack: {fileID: 0}
   block: {fileID: 0}
-  dash: {fileID: 0}
+  dash: {fileID: 8300000, guid: a5e4d062fc3cb714b8e20679e2acc059, type: 3}
 --- !u!1 &765399099794232875
 GameObject:
   m_ObjectHideFlags: 0

@@ -171,6 +171,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 
         if (!isAlive || isTaunting) { return; }
         if(isGrounded){
+            playerSounds.PlayJump();
             body.AddForce(Vector3.up * Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y), ForceMode.VelocityChange);
         }
         
@@ -180,6 +181,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
         if (!isAlive || isTaunting) { return; }
 
         if (remainingDashes > 0) {
+            playerSounds.PlayDash();
             dashTimer = 0.1f;
             dashDirection = inputs.x;
             remainingDashes--;

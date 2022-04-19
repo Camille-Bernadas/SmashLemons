@@ -12,9 +12,12 @@ public class PlayerSounds : MonoBehaviour
 
     /*Head/Voices*/
     public void PlayTaunt(){
+        float pitch = 1f;
         headAudioSource.PlayOneShot(taunt);
     }
     public void PlayHit() {
+        float pitch = Random.Range(0.7f, 1.3f);
+        headAudioSource.pitch = pitch;
         headAudioSource.PlayOneShot(hit);
     }
 
@@ -35,9 +38,13 @@ public class PlayerSounds : MonoBehaviour
         middleAudioSource.PlayOneShot(ultimateAttack);
     }
     public void PlayDash() {
+        float pitch = Random.Range(0.7f, 1.3f);
+        middleAudioSource.pitch = pitch;
         middleAudioSource.PlayOneShot(dash);
     }
     public void PlayJump(){
+        float pitch = Random.Range(0.7f, 1.3f);
+        middleAudioSource.pitch = pitch;
         middleAudioSource.PlayOneShot(jump);
     }
 }
