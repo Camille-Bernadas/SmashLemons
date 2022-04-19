@@ -18,7 +18,7 @@ public class SelectScreenManager : MonoBehaviour
 
     public GameObject playerPreviewCanvas;
     public GameObject characterCanvas;
-    public GameObject SelectorPlayerDefault;
+    public GameObject SelectorDefault;
     bool loadLevel;
 
     public Sprite unactive;
@@ -77,9 +77,9 @@ public class SelectScreenManager : MonoBehaviour
                     {
                         if(playerInterfaces[i].characterValue == 0)
                         {
+                            HandleSelectorPosition(playerInterfaces[i]); // find active portrait
                             if(playerInterfaces[i].activeX > -1)
                             {
-                                HandleSelectorPosition(playerInterfaces[i]); // find active portrait
                                 HandleCharacterPreview(playerInterfaces[i], i); // gere la creation et la visualisation du portrait
                             }   
                         }
@@ -119,12 +119,53 @@ public class SelectScreenManager : MonoBehaviour
 
     void HandleSelectorPosition(PlayerInterfaces player)
     {
-        player.SelectorPlayer.SetActive(true); //enable the selector
-        player.activeC = charGrid[player.activeX, player.activeY]; // find the active character
-        
-        Vector2 selectorPosition = player.activeC.transform.localPosition;
-        selectorPosition = selectorPosition + new Vector2(characterCanvas.transform.localPosition.x, characterCanvas.transform.localPosition.y);
+        if(player.activeX < 0)
+        {
+            DefaultSelectorCharacterPosition(player);
+            player.SelectorPlayer.SetActive(true); //enable the selector
+            
+            Vector2 selectorPosition = playerGrid[player.activeY].transform.localPosition;
+            selectorPosition = selectorPosition + new Vector2(playerPreviewCanvas.transform.localPosition.x, playerPreviewCanvas.transform.localPosition.y);
 
+            player.SelectorPlayer.transform.localPosition = selectorPosition;
+        }
+        else
+        {
+            DefaultSelectorPlayerPosition(player);
+            player.SelectorCharacter.SetActive(true); //enable the selector
+            player.activeC = charGrid[player.activeX, player.activeY]; // find the active character
+            
+            Vector2 selectorPosition = player.activeC.transform.localPosition;
+            selectorPosition = selectorPosition + new Vector2(characterCanvas.transform.localPosition.x, characterCanvas.transform.localPosition.y);
+
+            player.SelectorCharacter.transform.localPosition = selectorPosition;
+        }
+        
+    }
+
+    void DefaultSelectorPosition(PlayerInterfaces player)
+    {
+        DefaultSelectorCharacterPosition(player);
+        DefaultSelectorPlayerPosition(player);
+    }
+
+    void DefaultSelectorCharacterPosition(PlayerInterfaces player)
+    {
+        player.SelectorCharacter.SetActive(true); //enable the selection
+
+        Vector2 selectorPosition = SelectorDefault.transform.localPosition;
+        selectorPosition = selectorPosition + new Vector2( SelectorDefault.transform.localPosition.x,  SelectorDefault.transform.localPosition.y);
+            
+        player.SelectorCharacter.transform.localPosition = selectorPosition;
+    }
+
+    void DefaultSelectorPlayerPosition(PlayerInterfaces player)
+    { 
+        player.SelectorPlayer.SetActive(true);//enable the selector
+
+        Vector2 selectorPosition = SelectorDefault.transform.localPosition;
+        selectorPosition = selectorPosition + new Vector2( SelectorDefault.transform.localPosition.x,  SelectorDefault.transform.localPosition.y);
+            
         player.SelectorPlayer.transform.localPosition = selectorPosition;
     }
 
@@ -152,7 +193,7 @@ public class SelectScreenManager : MonoBehaviour
         PrepareData();
 
         yield return new WaitForSeconds(0);
-        SceneManager.LoadScene(1/*remplir ici la scene a jeu*/);
+        SceneManager.LoadScene(1/*ici la scene de jeu*/);
     }
 
     void PrepareData()//enregistrer la valeur de chaque playerInterfaces (isPlayer, isActive, characterValue) dans saveData
@@ -181,6 +222,10 @@ public class SelectScreenManager : MonoBehaviour
                     {
                         playerInterfaces[playerID].activeY = 3;
                     }
+                    if(playerInterfaces[playerID].activeY > 2 && playerInterfaces[playerID].activeX == 0) // assure que sur la premiere ligne les valeurs ne depasse pas la taille max de joueur(3)
+                    {
+                        playerInterfaces[playerID].activeY = 2;
+                    }
                 }
                 else
                 {
@@ -188,6 +233,10 @@ public class SelectScreenManager : MonoBehaviour
                     if(playerInterfaces[playerID].activeY > 3 && playerInterfaces[playerID].activeX == -1)
                     {
                         playerInterfaces[playerID].activeY = 3;
+                    }
+                    if(playerInterfaces[playerID].activeY > 2 && playerInterfaces[playerID].activeX == 0) // assure que sur la premiere ligne les valeurs ne depasse pas la taille max de joueur(3)
+                    {
+                        playerInterfaces[playerID].activeY = 2;
                     }
                 }
             }
@@ -237,6 +286,7 @@ public class SelectScreenManager : MonoBehaviour
             else
             {
                 playerInterfaces[playerID].characterValue = charGrid[playerInterfaces[playerID].activeX, playerInterfaces[playerID].activeY].characterId;
+                playerGrid[playerID].playerReady();
             }
         }
         else
@@ -249,6 +299,7 @@ public class SelectScreenManager : MonoBehaviour
     {
         if(playerInterfaces[playerID].characterValue != 0)
         {
+            playerGrid[playerID].playerReady();
             playerInterfaces[playerID].characterValue = 0;
         }
         else
@@ -267,12 +318,7 @@ public class SelectScreenManager : MonoBehaviour
         player.activeC = charGrid[player.activeX, player.activeY];
         if(player.isActive)
         {
-            player.SelectorPlayer.SetActive(true); //enable the selector
-
-            Vector2 selectorPosition = SelectorPlayerDefault.transform.localPosition;
-            selectorPosition = selectorPosition + new Vector2( SelectorPlayerDefault.transform.localPosition.x,  SelectorPlayerDefault.transform.localPosition.y);
-            
-            player.SelectorPlayer.transform.localPosition = selectorPosition;
+            DefaultSelectorPosition(player);
             if(player.isPlayer)
             {
                 player.isPlayer = false;
@@ -296,6 +342,7 @@ public class SelectScreenManager : MonoBehaviour
     {
         public CharacterInfo activeC;
         public CharacterInfo previewC;
+        public GameObject SelectorCharacter;
         public GameObject SelectorPlayer;
 
         public int characterValue;

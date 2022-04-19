@@ -36,6 +36,8 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     protected int remainingLives;
     public GameObject respawnParticle;
     protected bool isAlive = true;
+    protected bool isTaunting = false;
+    protected float tauntTimer;
 
 
     /* References to other objects */
@@ -86,7 +88,23 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     virtual protected void Update() {
-        if (!isAlive) { return; }
+        if (!isAlive) { 
+            animator.SetBool("isMoving", true);
+            return;
+        }
+        if(isTaunting){
+            Debug.Log("Taunt");
+            if(tauntTimer>0f){
+                tauntTimer-=Time.deltaTime;
+            }
+            else{
+                isTaunting = false;
+                animator.Play("Idle", 1, 0f);
+                animator.Play("Idle", 0, 0f);
+                
+            }
+        }
+        
         isGrounded = Physics.CheckSphere(groundChecker.position, GroundDistance, Ground, QueryTriggerInteraction.Ignore);
         if (isGrounded) {
             if (dashTimer <= 0f) {
@@ -135,7 +153,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 
 
     void FixedUpdate() {
-        if (!isAlive) { return; }
+        if (!isAlive || isTaunting) { return; }
         if (true) {
             Vector3 move = new Vector3(inputs.x, 0f, 0f);
             Move(move);
@@ -145,13 +163,13 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     public void OnMove(InputAction.CallbackContext ctx) => inputs = ctx.ReadValue<Vector2>();
 
     public void Move(Vector3 move) {
-        if (!isAlive) { return; }
+        if (!isAlive || isTaunting) { return; }
         body.MovePosition(body.position + move * speed * Time.fixedDeltaTime);
     }
 
     public void Jump() {
 
-        if (!isAlive) { return; }
+        if (!isAlive || isTaunting) { return; }
         if(isGrounded){
             body.AddForce(Vector3.up * Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y), ForceMode.VelocityChange);
         }
@@ -159,7 +177,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public void Dash() {
-        if (!isAlive) { return; }
+        if (!isAlive || isTaunting) { return; }
 
         if (remainingDashes > 0) {
             dashTimer = 0.1f;
@@ -220,7 +238,7 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
 
     }
     public void Attack(Vector2 direction) {
-        if (!isAlive) { return; }
+        if (!isAlive || isTaunting) { return; }
         animator.Play("BasicAttack", 1, 0f);
         playerSounds.PlayAttack();
         StartCoroutine("preAttack", direction);
@@ -228,17 +246,17 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public void SpecialAttack() {
-        if (!isAlive) { return; }
+        if (!isAlive || isTaunting) { return; }
         throw new System.NotImplementedException();
     }
 
     public void UltimateAttack() {
-        if (!isAlive) { return; }
+        if (!isAlive || isTaunting) { return; }
         throw new System.NotImplementedException();
     }
 
     public void Block(InputAction.CallbackContext context) {
-        if (!isAlive) { return; }
+        if (!isAlive || isTaunting) { return; }
         if (context.started) {
             isBlocking = true;
             animator.SetBool("isMoving", false);
@@ -250,8 +268,17 @@ public abstract class Character : MonoBehaviour, ICharacter, IDamageable
     }
 
     public void Taunt() {
-        if (!isAlive) { return; }
-        throw new System.NotImplementedException();
+        Debug.Log("Try Taunt");
+        if (isAlive && !isTaunting) {
+            Debug.Log("Start Taunt");
+            isTaunting = true;
+            tauntTimer = 1f;
+            animator.Play("Taunt", 1, 0f);
+            animator.Play("Taunt", 0, 0f);
+            playerSounds.PlayTaunt();
+            
+            return;
+        }
     }
 
     public float Heal(float amount){

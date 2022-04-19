@@ -85,12 +85,12 @@ public class TestTarget : Character
         switch (state)
         {
             case 0:
-            print("idle");
+            //print("idle");
                 inputs = new Vector2(0.0f, 0.0f);
                 
                 break;
             case 1:
-                print("recovery");
+                //print("recovery");
                 inputs.x = 0.0f;
                 inputs.y = 1.0f;
                 Dash();
@@ -100,16 +100,16 @@ public class TestTarget : Character
                 //inputs.y = 0;
                 break;
             case 2:
-                print("Get closerToTheCenter");
+                //print("Get closerToTheCenter");
                 platDir = platformCenterDirection(thePlatformIamOn);
                 inputs.x = platDir.x;
                 inputs.y = platDir.y;
                 break;
             
             case 3:
-                print("attack");
+                //print("attack");
                 Vector2 attackDirection = targetPlayer.transform.position - position;
-                Debug.Log(targetPlayer.name);
+                //Debug.Log(targetPlayer.name);
                 if(targetPlayerDistance<1.0f){
                     if (attackCooldown <= 0f) {
                         attackCooldown = 1f / attackSpeed;

@@ -8,15 +8,18 @@ public class DisplayPlayerSelectorScript : MonoBehaviour
 {
     public Image Original;
     public SelectScreenManager manager;
+    public GameObject ready;
 
     public int posX;
     public int posY;
 
     public int playerID;
+    public bool isReady;
 
     public float timerToReset = 0f;
 
-    private void Update() {
+    private void Update()
+    {
         
         if (timerToReset > 0f)
         {
@@ -48,6 +51,20 @@ public class DisplayPlayerSelectorScript : MonoBehaviour
                     manager.onMove(playerID, -1, 0);
                 }
             }
+        }
+    }
+
+    public void playerReady()
+    {
+        if(isReady)
+        {
+            ready.SetActive(false);
+            isReady = false;
+        }
+        else
+        {
+            ready.SetActive(true);
+            isReady = true;
         }
     }
 

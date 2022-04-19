@@ -629,6 +629,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 78838fd9-5d08-4fd7-b022-483f474586f0
     m_ActionName: MenuNavigation/Cancel[/Keyboard/f,/Keyboard/j]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1529626314652241154}
+        m_TargetAssemblyTypeName: Character, Assembly-CSharp
+        m_MethodName: Taunt
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 84629f25-c1b4-4247-9f95-8e9f4e765bae
+    m_ActionName: Gameplay/Taunt[/Keyboard/h,/Keyboard/l]
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: PlayerOne
   m_DefaultActionMap: Gameplay
@@ -668,7 +684,7 @@ MonoBehaviour:
   middleAudioSource: {fileID: 3481734490512492768}
   hit: {fileID: 8300000, guid: 9357115a2c9b4f54aab02dacb38bb33b, type: 3}
   jump: {fileID: 0}
-  taunt: {fileID: 0}
+  taunt: {fileID: 8300000, guid: b248bad7456945e4689042fd25e54126, type: 3}
   basicAttack: {fileID: 8300000, guid: b62451449d014124b8518e793f0afa79, type: 3}
   specialAttack: {fileID: 0}
   ultimateAttack: {fileID: 0}
