@@ -318,22 +318,26 @@ public class SelectScreenManager : MonoBehaviour
         player.activeC = charGrid[player.activeX, player.activeY];
         if(player.isActive)
         {
-            DefaultSelectorPosition(player);
+            
             if(player.isPlayer)
             {
+                DefaultSelectorPosition(player);
+                player.isActive = false;
                 player.isPlayer = false;
+                player.characterValue = 0;
+                playerGrid[playerID].modifyImage(player.activeC.characterId, unactive);
             }
             else
             {
-                player.isActive = false;
                 player.characterValue = 0;
-                playerGrid[playerID].modifyImage(player.activeC.characterId, unactive);
+                player.isPlayer = true;
             }
         }
         else
         {
+            DefaultSelectorPosition(player);
             player.isActive = true;
-            player.isPlayer = true;
+            player.isPlayer = false;
         }
     }
 
