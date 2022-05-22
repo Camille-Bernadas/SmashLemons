@@ -216,7 +216,7 @@
                 {
                     "name": "",
                     "id": "c3aab0f5-bbcc-4d88-8799-732e0c7ad709",
-                    "path": "<Keyboard>/j",
+                    "path": "<Keyboard>/numpad4",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -249,7 +249,7 @@
                 {
                     "name": "",
                     "id": "6b7fdd4b-dea5-4a63-b1e2-da0ae7e41779",
-                    "path": "<Keyboard>/k",
+                    "path": "<Keyboard>/numpad5",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -282,7 +282,7 @@
                 {
                     "name": "",
                     "id": "3cd94fb8-b386-4dcc-ae54-b9c22c7051d9",
-                    "path": "<Keyboard>/i",
+                    "path": "<Keyboard>/numpad7",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -315,7 +315,7 @@
                 {
                     "name": "",
                     "id": "1aa806c9-584b-4612-aaf7-494de970713a",
-                    "path": "<Keyboard>/p",
+                    "path": "<Keyboard>/numpad9",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
@@ -381,10 +381,21 @@
                 {
                     "name": "",
                     "id": "1da70b56-9c72-4571-a20f-ab8f346b620e",
-                    "path": "<Keyboard>/l",
+                    "path": "<Keyboard>/numpad6",
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
+                    "action": "Taunt",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cf39b3f4-cf0c-4777-8b14-4bd277c58499",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerThree",
                     "action": "Taunt",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -536,6 +547,17 @@
                 },
                 {
                     "name": "",
+                    "id": "9715da33-cc12-4096-80ae-11ae56aedd61",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerThree",
+                    "action": "Navigate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "d338e81e-79f0-4504-bcd7-33a5b2760293",
                     "path": "<Keyboard>/r",
                     "interactions": "",
@@ -558,6 +580,17 @@
                 },
                 {
                     "name": "",
+                    "id": "66cf0f37-d19e-41b5-b504-38e8409fe0e9",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerThree",
+                    "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "8e62abbd-a056-43a9-a7ae-a476f7a101d8",
                     "path": "<Keyboard>/f",
                     "interactions": "",
@@ -574,6 +607,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "PlayerTwo",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "db5a4634-4f3e-4f5c-bddd-b112b51fcf45",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PlayerThree",
                     "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false
